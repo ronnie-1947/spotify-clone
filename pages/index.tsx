@@ -1,9 +1,15 @@
 import styles from '../styles/Home.module.scss'
-import React, { useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import SpotifyWebApi from 'spotify-web-api-js'
 
 import { getAccessCode } from '../lib/spotify'
 import Loading from '../components/loading/Loading'
+import Player from '../page_components/Player/Player'
+
+import {useStateContextValue} from '../context/StateProvider'
+
+const spotify = new SpotifyWebApi()
 
 interface Token {
   access_token: string | undefined;
@@ -14,18 +20,34 @@ interface Token {
 export default function Home() {
 
   const router = useRouter()
-  const [token, setToken] = useState<string | null>(null)
+  const [{user, token}, dispatch] = useStateContextValue()
 
   useEffect(() => {
-
-    const { access_token}: Token = getAccessCode()
+    
+    const {access_token}: Token = getAccessCode()
     window.location.hash = ''
+    
+    if (token || access_token) {
 
-    if (access_token) { setToken(access_token) }
+      // Store the token
+      access_token && dispatch({
+        type: 'SET_TOKEN',
+        payload: access_token
+      })
+      
+      spotify.setAccessToken(token)
+      spotify.getMe().then(user=> {
+        
+        // Store the user
+        dispatch({
+          type: 'SET_USER',
+          payload: user
+        })
+      })
+    }
     else { router.push('/login') }
 
-  }, [setToken])
-
+  }, [dispatch])
 
   if (!token) {
     return (
@@ -36,8 +58,8 @@ export default function Home() {
   }
 
   return (
-    <main className={styles.main}>
-      <h1>We are making Spotify Clone 🚀</h1>
-    </main>
+    <Fragment>
+      <Player/>
+    </Fragment>
   )
 }
