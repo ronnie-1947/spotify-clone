@@ -1,0 +1,43 @@
+//MEDIA QUERY MANAGER
+
+// Formula ScreenSize(px)/16 = max-width(em)
+
+// @mixin respond-phone {
+//     @media (max-width : 600px) {@content}
+// }
+
+@mixin respond($breakpoint) {
+    @if $breakpoint == x-small-phone {  // 375px
+        @media (max-width : 23.4em) {
+            @content
+        };
+    }
+    @if $breakpoint == phone{  // 425px
+        @media (max-width : 26.56em) {
+            @content
+        };
+    }
+    @if $breakpoint == phone-large {  // 500px
+        @media (max-width : 31.25em) {
+            @content
+        };
+    }
+    @if $breakpoint == tablet {
+        @media (max-width : 48em) { // 768px
+            @content
+        };
+    }
+    @if $breakpoint == laptop {
+        @media (max-width : 64em) { // 1024px
+            @content
+        };
+    }
+    @if $breakpoint == laptop-large {
+        @media (max-width : 80em) { // 1200px
+            @content
+        };
+    }
+    @if $breakpoint == big-desktop {
+        @media (min-width : 112.5em) {@content}; //1800px
+    }
+}
