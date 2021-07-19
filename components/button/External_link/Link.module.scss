@@ -1,0 +1,12 @@
+@import '../button_common.scss';
+@import '../../../sass/abstract/variables';
+
+.btn{
+    @include btn_commons;
+    background-color: $spotify_green;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: white;
+    text-decoration: none;
+    letter-spacing: 1px;
+}

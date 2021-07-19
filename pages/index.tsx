@@ -1,11 +1,11 @@
 import styles from '../styles/Home.module.scss'
 
+
+
 export default function Home() {
   return (
-    <div className={styles.container}>
-      <main className={styles.main}>
-          <h1>Hello we are making Spotify 🚀</h1>
-      </main>
-    </div>
+    <main className={styles.main}>
+      <h1>We are making Spotify Clone 🚀</h1>
+    </main>
   )
 }

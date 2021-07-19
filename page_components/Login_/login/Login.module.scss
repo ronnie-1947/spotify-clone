@@ -1,0 +1,29 @@
+.logo{
+
+    display: flex;
+    justify-content: center;
+    background-color: black;
+
+    img{
+        object-fit: contain;
+        height: 15rem;
+        max-width: 94%;
+    }
+}
+
+.login{
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    background-color: black;
+
+    &__container{
+        display: grid;
+        place-items: center;
+        color: white;
+
+        div{
+            margin-top: 1rem;
+        }
+    }
+}
