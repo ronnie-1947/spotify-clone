@@ -1,65 +1,21 @@
-import styles from '../styles/Home.module.scss'
-import React, { Fragment, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import SpotifyWebApi from 'spotify-web-api-js'
+import Layout from '../layout/Layout'
+import styles from '../styles/Player.module.scss'
 
-import { getAccessCode } from '../lib/spotify'
-import Loading from '../components/loading/Loading'
-import Player from '../page_components/Player/Player'
-
-import {useStateContextValue} from '../context/StateProvider'
-
-const spotify = new SpotifyWebApi()
-
-interface Token {
-  access_token: string | undefined;
-  expires_in: string | undefined;
-  token_type: string | undefined;
-}
+import Sidebar from '../page_components/sidebar/Sidebar'
+import PlayerBody from '../page_components/Player_body/Player_body'
+import Footer from '../components/footer/Footer'
 
 export default function Home() {
 
-  const router = useRouter()
-  const [{user, token}, dispatch] = useStateContextValue()
-
-  useEffect(() => {
-    
-    const {access_token}: Token = getAccessCode()
-    window.location.hash = ''
-    
-    if (token || access_token) {
-
-      // Store the token
-      access_token && dispatch({
-        type: 'SET_TOKEN',
-        payload: access_token
-      })
-      
-      spotify.setAccessToken(token)
-      spotify.getMe().then(user=> {
-        
-        // Store the user
-        dispatch({
-          type: 'SET_USER',
-          payload: user
-        })
-      })
-    }
-    else { router.push('/login') }
-
-  }, [dispatch])
-
-  if (!token) {
-    return (
-      <div className={styles.full_background}>
-        <Loading/>
-      </div>
-    )
-  }
-
   return (
-    <Fragment>
-      <Player/>
-    </Fragment>
+    <Layout>
+      <div className= {styles.player}>
+            <div className={styles.player__body}>
+                <Sidebar/>
+                <PlayerBody/>
+            </div>
+            <Footer/>
+        </div>
+    </Layout>
   )
 }
