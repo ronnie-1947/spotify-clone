@@ -3,7 +3,7 @@ import styles from '../styles/Player.module.scss'
 
 import Sidebar from '../page_components/sidebar/Sidebar'
 import PlayerBody from '../page_components/Player_body/Player_body'
-import Footer from '../components/footer/Footer'
+import Footer from '../page_components/footer/Footer'
 
 export default function Home() {
 

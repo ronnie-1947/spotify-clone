@@ -24,3 +24,9 @@ html{
     font-size: 78%;
   }
 }
+
+body{
+  ::-webkit-scrollbar{
+    display: none;
+  }
+}

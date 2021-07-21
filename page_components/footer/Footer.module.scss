@@ -1,0 +1,74 @@
+@import "../../sass/abstract/variables";
+
+.footer{
+    background-color: #282828;
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+
+    &__left {
+        flex: .3;
+        display: flex;
+        max-width: 30rem;
+    }
+
+    &__albumImg{
+        margin-right: 2rem;
+        display: flex;
+        align-items: center;
+        img{
+            object-fit: contain;
+            max-height: 6rem;
+        }
+    }
+
+    &__songInfo{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: white;
+    }
+    
+    &__center {
+        flex: .4;
+        display: flex;
+        padding: 0 5rem;
+        justify-content: space-between;
+        color: white;
+        align-items: center;
+        max-width: 30rem;
+    }
+
+    &__right {
+        flex: .3;
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        max-width: 25rem;
+
+        &_span{
+            display: flex;
+            height: 100%;
+            align-items: center;
+        }
+    }
+
+    &__icon{
+        color: grey;
+        
+        
+        &:hover{
+            transition: all .2s ease-in-out;
+            transform: scale(1.2) !important;
+            color: white;
+        }
+    }
+
+    &__green {
+        color: $spotify_green;
+    }
+
+}
+
