@@ -1,6 +1,45 @@
 .body{
     background-color: rgb(91, 87, 115);
-    background: linear-gradient(transparent, rgba(0,0,0,1));
+    background: linear-gradient(rgb(91, 87, 115), rgba(0,0,0,1));
     color: white;
     padding: 3rem;
+    max-height: calc(100vh - 9rem);
+    overflow-y: auto;
+
+    &__info{
+        display: flex;
+        align-items: flex-end;
+        padding: 1rem;
+
+        &_img{
+            display: flex;
+            overflow: hidden;
+            min-height: 15rem;
+            min-width: 15rem;
+            
+            img{
+                min-height: 15rem;
+                min-width: 15rem;
+                max-height: 15vw;
+                object-fit: contain;
+            }
+
+            box-shadow: 0 4px 60px rgba(0,0,0,.5);
+        }
+
+        &_text{
+            flex: 1;
+            // background-color: tomato;
+            margin-left: 2rem;
+
+            h2 {
+                font-size: 5.8rem;
+                margin-bottom: 1rem;
+            }
+
+            p {
+                font-size: 1.4rem;
+            }
+        }
+    }
 }

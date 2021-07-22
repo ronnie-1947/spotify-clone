@@ -16,13 +16,6 @@ html{
     // width < 768
     font-size: 50%;
   }
-  @include respond(phone-large) {
-    // width < 500
-    font-size: 44%;
-  }
-  @include respond(big-desktop) {
-    font-size: 78%;
-  }
 }
 
 body{

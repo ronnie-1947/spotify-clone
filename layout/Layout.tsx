@@ -62,6 +62,17 @@ const Common = ({ children }: Props) => {
                 setLoading(false)
                 
                 //  Get the users playlist
+                spotify.searchPlaylists('discover weekly').then( async ({playlists}:any)=>{
+                    if(!playlists)return
+                    const id = playlists?.items?.[0]?.id
+                    
+                    const tracks = await spotify.getPlaylist(id?id:'37i9dQZEVXcKatfd95a3vi')
+                    
+                    dispatch({
+                        type: 'SET_ACTIVE_PLAYLIST',
+                        active_playlist: tracks
+                    })
+                })
                 spotify.getFeaturedPlaylists().then((playlists)=>{
                     dispatch({
                         type: 'SET_PLAYLISTS',

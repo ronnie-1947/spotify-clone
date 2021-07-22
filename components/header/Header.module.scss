@@ -1,0 +1,39 @@
+@import "../../sass/abstract/mixin";
+
+.header{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+
+    &__left{
+        background-color: white;
+        color: grey;
+        border-radius: 3rem;
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        min-width: 15rem;
+
+        input {
+            border:none;
+            width: 100%;
+
+            &:focus{
+                outline: none;
+            }
+        }
+    }
+
+    &__right{
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        h4{
+            margin-left: 1rem;
+            @include respond(tablet){
+                display: none;
+            }
+        }
+    }
+}
