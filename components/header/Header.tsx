@@ -19,7 +19,6 @@ const Header = ({user}:Props) => {
         <header className={styles.header}>
             <div className={styles.header__left}>
                 <SearchOutlined/>
-
                 <input type="text" placeholder="Search for Artists, Songs"/>
             </div>
             <div className={styles.header__right}>

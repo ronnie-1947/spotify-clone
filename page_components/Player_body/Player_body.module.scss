@@ -1,5 +1,6 @@
+@import "../../sass/abstract/variables";
+
 .body{
-    background-color: rgb(91, 87, 115);
     background: linear-gradient(rgb(91, 87, 115), rgba(0,0,0,1));
     color: white;
     padding: 3rem;
@@ -20,7 +21,7 @@
             img{
                 min-height: 15rem;
                 min-width: 15rem;
-                max-height: 15vw;
+                height: 15vw;
                 object-fit: contain;
             }
 
@@ -39,6 +40,26 @@
 
             p {
                 font-size: 1.4rem;
+            }
+        }
+    }
+
+
+    &__songs {
+        margin: 2rem 0;
+        display: grid;
+    }
+    
+    &__icons {
+        display: flex;
+        align-items: center;
+        margin: 2rem 1rem;
+
+        .icon{
+            transition: all .2s;
+            cursor: pointer;
+            &:hover{
+                color: $spotify-green;
             }
         }
     }

@@ -67,6 +67,7 @@ const Common = ({ children }: Props) => {
                     const id = playlists?.items?.[0]?.id
                     
                     const tracks = await spotify.getPlaylist(id?id:'37i9dQZEVXcKatfd95a3vi')
+                    // const tracks = await spotify.getPlaylist('37i9dQZF1DX5trt9i14X7j')
                     
                     dispatch({
                         type: 'SET_ACTIVE_PLAYLIST',

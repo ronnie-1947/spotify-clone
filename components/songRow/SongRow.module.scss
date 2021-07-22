@@ -1,0 +1,27 @@
+.song{
+
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    margin-left: 2rem;
+    cursor: pointer;
+    
+    &:hover {
+        background-color: black;
+        opacity: .8;
+    }
+
+    &__info {
+        margin-left: 2rem;
+
+        h1{
+            font-size: 1.6rem;
+        }
+
+        p {
+            font-size: 1.4rem;
+            margin-top: 3px;
+            color: grey;
+        }
+    }
+}
