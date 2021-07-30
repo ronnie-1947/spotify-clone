@@ -71,7 +71,7 @@ const Sidebar = () => {
             <div className={styles.sidebar__playlists}>
                 {
                     playlists?.playlists?.items?.map((playlist: { name: string, id: string }) => (
-                        <SidebarOption key={playlist.id} title={playlist.name} clickHandler={handlePlaylistChange} id={playlist.id} Icon={null} highlight={!current_page && active_playlist.name === playlist.name} />
+                        <SidebarOption key={playlist.id} title={playlist.name} clickHandler={handlePlaylistChange} id={playlist.id} Icon={null} highlight={current_page==='playlist' && active_playlist.name === playlist.name} />
                     ))
                 }
             </div>
