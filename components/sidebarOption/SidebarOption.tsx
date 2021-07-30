@@ -2,13 +2,16 @@ import React, { Fragment } from 'react'
 import styles from './SidebarOption.module.scss'
 
 interface Props {
-    title: string;
-    Icon: any;
+    title: string
+    Icon: any
+    highlight: boolean
+    clickHandler : (id: string)=>void
+    id: string
 }
 
-const SidebarOption = ({ title, Icon }: Props) => {
+const SidebarOption = ({ title, Icon, highlight , clickHandler, id}: Props) => {
     return (
-        <div className={styles.sidebarOption}>
+        <div onClick={()=>clickHandler(id)} className={`${styles.sidebarOption} ${highlight&& styles.sidebarOption_highlight}`}>
 
             {Icon ? (
                 <Fragment>

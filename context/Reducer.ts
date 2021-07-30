@@ -3,6 +3,7 @@ interface Action {
     payload: any;
     playlists: [];
     active_playlist: [];
+    current_page: string;
 }
 
 export const initialState = {
@@ -10,8 +11,11 @@ export const initialState = {
     token: null,
     playlists: [],
     active_playlist: [],
+    playing_playlist: [],
+    playing_track: null,
     playing: false,
-    item: null
+    item: null,
+    current_page: 'home'
 }
 
 export const reducer = (state:any, action:Action)=>{
@@ -41,6 +45,12 @@ export const reducer = (state:any, action:Action)=>{
             return {
                 ...state,
                 active_playlist: action.active_playlist
+            }
+
+        case 'SET_PAGE':
+            return {
+                ...state,
+                current_page: action.current_page
             }
 
         default: 

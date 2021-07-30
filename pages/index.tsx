@@ -9,13 +9,13 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className= {styles.player}>
-            <div className={styles.player__body}>
-                <Sidebar/>
-                <PlayerBody/>
-            </div>
-            <Footer/>
+      <div className={styles.player}>
+        <div className={styles.player__body}>
+          <Sidebar />
+          <PlayerBody />
         </div>
+        <Footer />
+      </div>
     </Layout>
   )
 }

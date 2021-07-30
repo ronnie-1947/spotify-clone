@@ -11,14 +11,10 @@ const Player = () => {
 
     const [{ user, active_playlist }] = useStateContextValue()
 
-    const style = {
-        // background: `linear-gradient(${active_playlist?.primary_color? active_playlist.primary_color :'rgb(91, 87, 115)'}, rgba(0,0,0,1))`
-    }
-
-    console.log(active_playlist)
+    // console.log(active_playlist)
 
     return (
-        <div className={styles.body} style={style}>
+        <div className={styles.body}>
             <Header user={user} />
 
             <div className={styles.body__info} >
@@ -45,8 +41,8 @@ const Player = () => {
                 </div>
 
                 {
-                    active_playlist?.tracks?.items.map((item:any)=>(
-                        <SongRow track={item?.track}/>
+                    active_playlist?.tracks?.items.map((item:any, i:number)=>(
+                        <SongRow key={i} track={item?.track}/>
                     ))
                 }
             </div>

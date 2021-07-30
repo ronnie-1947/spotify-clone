@@ -2,14 +2,12 @@ import React, { Fragment, useEffect, useState } from 'react'
 import styles from './Layout.module.scss'
 
 import { useRouter } from 'next/router'
-import SpotifyWebApi from 'spotify-web-api-js'
 
 import { getAccessCode } from '../lib/spotify'
+import spotify from '../lib/api_spotify'
 import { useStateContextValue } from '../context/StateProvider'
 
 import Spinner from '../components/loading/Loading'
-
-const spotify = new SpotifyWebApi()
 
 interface Props {
     children: React.ReactNode;
@@ -19,7 +17,7 @@ interface Token {
     access_token: string | undefined | null;
     expires_in: string | undefined;
     token_type: string | undefined;
-} 
+}
 
 
 const Common = ({ children }: Props) => {
@@ -62,12 +60,19 @@ const Common = ({ children }: Props) => {
                 setLoading(false)
                 
                 //  Get the users playlist
+                spotify.getMyCurrentPlayingTrack().then((song:any)=>{
+                    if(!song){
+                        return
+                    }
+                     
+                    console.log(song)
+                })
                 spotify.searchPlaylists('discover weekly').then( async ({playlists}:any)=>{
                     if(!playlists)return
                     const id = playlists?.items?.[0]?.id
                     
                     const tracks = await spotify.getPlaylist(id?id:'37i9dQZEVXcKatfd95a3vi')
-                    // const tracks = await spotify.getPlaylist('37i9dQZF1DX5trt9i14X7j')
+                    // const tracks = await spotify.getPlaylist('15ngsvOmlTkARCg7ipoNvG')
                     
                     dispatch({
                         type: 'SET_ACTIVE_PLAYLIST',
