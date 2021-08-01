@@ -1,0 +1,92 @@
+.songRow {
+    margin-bottom: 3rem;
+
+    &__heading{
+        text-transform: capitalize;
+        margin-bottom: 1rem;
+    }
+
+    &__cards{
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(23rem, 1fr));
+        column-gap: 2rem;
+        grid-template-rows: 1fr;
+        grid-auto-rows: 0;
+        overflow: hidden;
+    }
+
+    &__cardsAll {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(23rem, 1fr));
+        grid-gap: 2rem;
+    }
+}
+
+.card{
+
+    display: grid;
+    align-items: center;
+
+    span{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        img{
+            max-width: 100%;
+            max-height: 22rem;
+            object-fit: contain;
+        }
+    }
+
+}
+
+.card{
+    cursor: pointer;
+    min-height: 18rem;
+    min-width: 15rem;
+    padding: 2rem;
+    display: grid;
+    position: center;
+    background-color: #b3b3b30e;
+    border-radius: 5px;
+    transition: all .2s;
+
+    &:hover {
+        background-color: #b3b3b31c;
+    }
+
+    &__name{
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        margin-top: 2rem;
+    }
+    
+    &__author{
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        color: grey;
+        margin-top: 4px;
+    }
+
+    &__imgContainerRounded {
+        img{
+            border-radius: 70%;
+            overflow: hidden;
+        }
+    }
+}
+
+
+.more__container{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+
+    span{
+        cursor: pointer;
+    }
+}

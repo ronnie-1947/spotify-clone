@@ -7,15 +7,16 @@ import { useStateContextValue } from '../../context/StateProvider'
 
 interface Props {
     user: {
-        images: { url: string }[];
-        display_name: string;
+        images: { url: string }[]
+        display_name: string
     }
+    search: string
+    setSearch: any
 }
 
-const Header = ({ user }: Props) => {
+const Header = ({ user, search, setSearch}: Props) => {
 
     const [{ current_page }] = useStateContextValue()
-    console.log(current_page)
 
     return (
         <header className={styles.header}>
@@ -23,12 +24,12 @@ const Header = ({ user }: Props) => {
                 <Fragment>
                     <div className={styles.header__left}>
                         <SearchOutlined />
-                        <input type="text" placeholder="Search for Artists, Songs and podcasts"/>
+                        <input type="search" value={search} onChange={(e:any)=> setSearch(e.target? e.target.value: '')} placeholder="Search for Artists, Songs and podcasts"/>
                     </div>
                 </Fragment>
             ): <div></div>}
             <div className={styles.header__right}>
-                <Avatar src={user?.images[0]?.url} alt={user.display_name.trim()} />
+                <Avatar src={user?.images[0]?.url} alt={user?.display_name.trim()} />
                 <h4>{user?.display_name?.length > 15 ? user.display_name.substring(0, 15).trim() + '...' : user.display_name.trim()}</h4>
             </div>
         </header>

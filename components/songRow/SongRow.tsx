@@ -7,8 +7,7 @@ interface Props {
 }
 
 const SongRow = ({track}: Props) => {
-
-    // console.log(track)
+    console.log(track)
     return (
         <div className={styles.song}>
             <Image src={track?.album?.images[0]?.url} alt={track?.name} height={50} width={50} />

@@ -65,7 +65,7 @@ const Common = ({ children }: Props) => {
                         return
                     }
                      
-                    console.log(song)
+                    // console.log(song)
                 })
                 spotify.searchPlaylists('discover weekly').then( async ({playlists}:any)=>{
                     if(!playlists)return

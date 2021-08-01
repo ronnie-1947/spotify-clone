@@ -8,7 +8,7 @@ import SongRow from '../../../components/songRow/SongRow'
 const Playlist = () => {
 
     const [{active_playlist, user}] = useStateContextValue()
-
+    
     return (
         <Fragment>
             <div className={styles.body__info} >
@@ -22,7 +22,7 @@ const Playlist = () => {
                     }
                 </span>
                 <div className={styles.body__info_text}>
-                    <strong>PLAYLIST</strong>
+                    <strong style={{textTransform: 'uppercase'}}>{active_playlist?.type}</strong>
                     <h2>{active_playlist?.name}</h2>
                     <p>{active_playlist?.description}</p>
                 </div>
