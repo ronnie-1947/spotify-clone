@@ -5,7 +5,7 @@ import { useStateContextValue } from '../../context/StateProvider'
 
 interface Props {
     row: any[]
-    heading: ('artists' | 'albums' | 'playlists' | 'shows')
+    heading: ('artists' | 'albums' | 'playlists' | 'shows' | 'recently played')
 }
 
 const SearchRow = ({ row, heading }: Props) => {
@@ -13,7 +13,7 @@ const SearchRow = ({ row, heading }: Props) => {
     const [more, setMore] = useState(false)
     const [{ }, dispatch] = useStateContextValue()
 
-    const clickHandler = async (lib: any, type: ('artists' | 'albums' | 'playlists' | 'shows')) => {
+    const clickHandler = async (lib: any, type: ('artists' | 'albums' | 'playlists' | 'shows'| 'recently played')) => {
 
         if (type === 'artists') {
 

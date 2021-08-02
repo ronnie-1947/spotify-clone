@@ -19,7 +19,14 @@ const Search = ({searchStr}:Props) => {
 
         const timer = setTimeout(async() => {
             
-            if(!searchStr)return
+            if(!searchStr){
+                const playlists: any = await spotify.getFeaturedPlaylists()
+                const artists: any = await spotify.getMyTopArtists()
+                
+                setPlaylists(playlists?.playlists?.items)
+                setArtists(artists?.items)
+                return
+            }
             
             const artists: any = await spotify.searchArtists(searchStr)
             const albums: any = await spotify.searchAlbums(searchStr)
@@ -33,6 +40,8 @@ const Search = ({searchStr}:Props) => {
             setShows(shows?.shows?.items)
 
         }, 500);
+
+        
 
         return ()=>{
             clearTimeout(timer)
