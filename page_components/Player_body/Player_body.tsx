@@ -5,6 +5,7 @@ import { useStateContextValue } from '../../context/StateProvider'
 import Playlist from './playlist/Playlist'
 import Header from '../../components/header/Header'
 import Search from './search/Search'
+import Library from './library/Library'
 
 
 const Player = () => {
@@ -16,7 +17,7 @@ const Player = () => {
         <div className={styles.body}>
             <Header search={search} setSearch={setSearch} user={user} />
             {
-                current_page === 'home'|| current_page === 'playlist'? <Playlist/>: current_page === 'search'? <Search searchStr={search}/>:null
+                current_page === 'home'|| current_page === 'playlist'? <Playlist/>: current_page === 'search'? <Search searchStr={search}/>: current_page === 'library'? <Library/> :null
             }
             
         </div>
