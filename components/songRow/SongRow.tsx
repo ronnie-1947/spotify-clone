@@ -4,12 +4,13 @@ import Image from 'next/image'
 
 interface Props {
     track: any
+    clickHandler: (track:any)=>void
 }
 
-const SongRow = ({track}: Props) => {
+const SongRow = ({track, clickHandler}: Props) => {
     
     return (
-        <div className={styles.song}>
+        <div onClick={()=>clickHandler(track)} className={styles.song}>
             <Image src={track?.album?.images[0]?.url} alt={track?.name} height={50} width={50} />
             <div className={styles.song__info}>
                 <h1>{track.name}</h1>

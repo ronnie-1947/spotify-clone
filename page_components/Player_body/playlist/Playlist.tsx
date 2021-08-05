@@ -7,8 +7,21 @@ import SongRow from '../../../components/songRow/SongRow'
 
 const Playlist = () => {
 
-    const [{active_playlist, user}] = useStateContextValue()
-    
+    const [{active_playlist, user}, dispatch] = useStateContextValue()
+
+    const playTrack = async (track:any)=>{
+
+        const playlist_id = active_playlist?.id
+        
+        dispatch({
+            type: 'SET_PLAYING_DETAILS',
+            payload: {
+                playing_playlist_id: playlist_id,
+                playing_track_id: track?.id
+            }
+        })
+    }
+   
     return (
         <Fragment>
             <div className={styles.body__info} >
@@ -36,7 +49,7 @@ const Playlist = () => {
 
                 {
                     active_playlist?.tracks?.items.map((item:any, i:number)=>(
-                        <SongRow key={i} track={item?.track}/>
+                        <SongRow clickHandler={playTrack} key={i} track={item?.track}/>
                     ))
                 }
             </div>

@@ -35,12 +35,19 @@
     
     &__center {
         flex: .4;
-        display: flex;
-        padding: 0 5rem;
-        justify-content: space-between;
-        color: white;
-        align-items: center;
-        max-width: 30rem;
+        max-width: 35rem;
+        // display: grid;
+        // background-color: tomato;
+        // background-color: dodgerblue;
+        
+        &_btns{
+            padding: 0 7rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            color: white;
+        }
     }
 
     &__right {

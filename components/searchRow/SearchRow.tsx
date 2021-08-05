@@ -18,7 +18,7 @@ const SearchRow = ({ row, heading }: Props) => {
         if (type === 'artists') {
 
             const artist_tracks = await spotify.getArtistTopTracks(lib?.id, 'US')
-
+            
             const playlist = {
                 ...lib,
                 tracks: {

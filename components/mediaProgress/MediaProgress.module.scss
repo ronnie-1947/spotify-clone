@@ -1,0 +1,17 @@
+@import "../../sass/abstract/variables";
+
+.progress{
+    background-color: #eeeeee91;
+    border-radius: 5px;
+    height: 3px;
+    margin-top: 2rem;
+    width: 100%;
+    cursor: pointer;
+
+    &__bar{
+        height: 100%;
+        width: 0;
+        max-width: 100%;
+        background-color: $spotify_green;
+    }
+}
