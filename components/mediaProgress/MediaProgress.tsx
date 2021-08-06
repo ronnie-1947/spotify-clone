@@ -1,10 +1,17 @@
 import React from 'react'
 import styles from './MediaProgress.module.scss'
 
-const MediaProgress = () => {
+interface Props {
+    playTime: number
+    playTimeHandler: (event:any)=>void
+}
+
+const MediaProgress = ({playTime, playTimeHandler}:Props) => {
     return (
-        <div className={styles.progress}>
-            <div style={{width: '22%'}} className={styles.progress__bar}></div>
+        <div onClick={playTimeHandler} className={styles.progress_container}>
+            <div className={styles.progress} onClick={playTimeHandler}>
+                <div style={{width: `${playTime}%`}} className={styles.progress__bar}></div>
+            </div>
         </div>
     )
 }

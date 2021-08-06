@@ -51,12 +51,13 @@ const SearchRow = ({ row, heading }: Props) => {
         } else if (type === 'shows') {
 
             const shows = await spotify.getShowEpisodes(lib?.id)
-
+    
             const playlist = {
                 ...lib,
                 tracks: {
                     items: shows?.items?.map((c: any) => ({
                         track: {
+                            id: c.id,
                             preview_url: c.audio_preview_url,
                             name: c.name,
                             album: { images: c.images }

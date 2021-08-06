@@ -9,6 +9,8 @@ interface Props {
 
 const SongRow = ({track, clickHandler}: Props) => {
     
+    if(!track?.preview_url) return null
+    
     return (
         <div onClick={()=>clickHandler(track)} className={styles.song}>
             <Image src={track?.album?.images[0]?.url} alt={track?.name} height={50} width={50} />

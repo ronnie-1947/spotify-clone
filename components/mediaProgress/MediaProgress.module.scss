@@ -1,12 +1,16 @@
 @import "../../sass/abstract/variables";
 
+.progress_container {
+    height: 5px;
+    cursor: pointer;
+}
+
 .progress{
     background-color: #eeeeee91;
     border-radius: 5px;
     height: 3px;
     margin-top: 2rem;
     width: 100%;
-    cursor: pointer;
 
     &__bar{
         height: 100%;

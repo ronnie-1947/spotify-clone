@@ -21,7 +21,7 @@ const Playlist = () => {
             }
         })
     }
-   
+    console.log(active_playlist)
     return (
         <Fragment>
             <div className={styles.body__info} >

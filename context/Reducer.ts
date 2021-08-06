@@ -7,6 +7,8 @@ interface Action {
     playing_playlist_id: string
     playing_track_id: string
     playing: boolean
+    shuffle: boolean
+    repeat: boolean
 }
 
 export const initialState = {
@@ -18,7 +20,7 @@ export const initialState = {
     playing_track_id: null,
     outer_playing_track_id: null,
     shuffle: false,
-    repeat: true,
+    repeat: false,
     playing: false,
     item: null,
     current_page: 'home'
@@ -76,6 +78,18 @@ export const reducer = (state:any, action:Action)=>{
             return {
                 ...state,
                 playing: action.playing
+            }
+
+        case 'SET_SHUFFLE':
+            return {
+                ...state,
+                shuffle: action.shuffle
+            }
+
+        case 'SET_REPEAT':
+            return {
+                ...state,
+                repeat: action.repeat
             }
 
         default: 

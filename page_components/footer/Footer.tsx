@@ -7,14 +7,36 @@ import { PlayCircleOutlineOutlined, PauseCircleFilledOutlined, SkipPrevious, Ski
 import { Grid, Slider} from '@material-ui/core'
 import MediaProgress from '../../components/mediaProgress/MediaProgress'
 
+const suffleArray: (arr:any[])=>any[] = (pointerarr) => {
+
+    let newPos, temp, arr=[...pointerarr]
+    arr.forEach((_, indx) => {
+        newPos = Math.floor(Math.random() * arr.length)
+        temp = arr[newPos]
+        arr[newPos] = arr[indx]
+        arr[indx] = temp
+    })
+    return arr
+}
+
 const Footer = () => {
 
-    const [{active_playlist, shuffle, outer_playing_track_id, repeat, playing_playlist_id, playing_track_id, playing}, dispatch] = useStateContextValue()
+    const [{active_playlist,  shuffle, outer_playing_track_id, repeat, playing_playlist_id, playing_track_id, playing}, dispatch] = useStateContextValue()
     const audio = useRef<any>()
 
-    const [current_playlist, setCurrent_playlist] = useState([])
+    const [current_playlist, setCurrent_playlist] = useState<any[]>([])
     const [dupCurrent_playlist, setDupCurrent_playlist] = useState([])
-    const [playedPlaylist, setPlayedPlaylist] = useState<any[]>([])
+    const [volume, setVolume] = useState<number>(50)
+    const [playTime, setPlayTime] = useState(0)
+    const [playingTrack, setPlayingTrack] = useState<any>(null)
+
+    useEffect(()=>{
+
+        const derivedVolume = localStorage.getItem('volume')
+        if(!derivedVolume) return
+        setVolume( +derivedVolume *100)
+        audio.current.volume = +derivedVolume
+    },[])
 
     useEffect(()=>{
 
@@ -25,21 +47,32 @@ const Footer = () => {
             type: 'SET_PLAYING_TRACK',
             playing_track_id: outer_playing_track_id
         })
-        
+       
         const current_playlist = active_playlist?.tracks?.items?.map((t:any)=>{
-            if(t && t.track && t.track.preview_url){
+            
+            if(t && t.track && t.track.preview_url && t.track.id){
                 return {
                     id: t?.track?.id,
-                    preview_url: t?.track?.preview_url
+                    preview_url: t?.track?.preview_url,
+                    name: t?.track?.name,
+                    images: t?.track?.album?.images,
+                    artists: t?.track?.artists
                 }
             }
         }).filter((c:any)=>c)
         
-        
         const track = current_playlist.filter((c:{id:string})=>c.id===outer_playing_track_id)?.[0]
-        
-        setCurrent_playlist(current_playlist)
+        console.log(track)
         setDupCurrent_playlist(current_playlist)
+        setPlayingTrack(track)
+        
+        let c_playlist = current_playlist
+        
+        if(shuffle){
+            c_playlist = [track, ...suffleArray(current_playlist).filter((c:{id:string})=>c.id !== outer_playing_track_id)]
+        }
+        
+        setCurrent_playlist(c_playlist)
         
         current.src = track?.preview_url
         
@@ -61,8 +94,6 @@ const Footer = () => {
     }, [playing])
 
 
-
-
     const handlePlayPause = ()=>{
 
         if(!playing_track_id)return
@@ -74,72 +105,138 @@ const Footer = () => {
         })
     }
 
-
-
-
     const playNext = ()=>{
 
         if(!playing_track_id)return
         const {current} = audio
 
-        const previousPlayed = [...playedPlaylist]
+        let nextIndx = current_playlist?.findIndex(c=> c.id === playing_track_id) + 1
+        if(nextIndx >= current_playlist.length && repeat) nextIndx = 0
 
-        let randomIndx:number = current_playlist.findIndex((c: {id: string})=>c.id === playing_track_id)
+        const track = current_playlist[nextIndx]
+        if(!track) {
 
-        let modifiedPlaylist = [...current_playlist].filter((c:{id:string})=>{
+            current.src = ''
+            return
+        }
 
-            if(c.id !== playing_track_id)return c
-
-            previousPlayed.push(c)
+        dispatch({
+            type: 'SET_PLAYING_TRACK',
+            playing_track_id: track?.id
         })
+        setPlayingTrack(track)
 
-        if(randomIndx>modifiedPlaylist.length-1)randomIndx = 0
-        
-        if(modifiedPlaylist.length<1){
-            if(!repeat)return
-            modifiedPlaylist = [...dupCurrent_playlist]
-            randomIndx = 0
-        }
-        
-        if(shuffle){
-            randomIndx = Math.floor(Math.random()*modifiedPlaylist.length)
-        }
-        
-        
-        try {
-            const {id, preview_url} = modifiedPlaylist[randomIndx]
-            dispatch({
-                type: 'SET_PLAYING_TRACK',
-                playing_track_id: id
-            })
-            
-            setCurrent_playlist(modifiedPlaylist)
-            setPlayedPlaylist(previousPlayed)
-    
-            current.src= preview_url
-            
-        } catch (error) {
-            console.log(modifiedPlaylist)
-        }
-
+        current.src = track?.preview_url
+        dispatch({
+            type: 'SET_PLAY_PAUSE',
+            playing: true
+        })
     }
 
+
+    const playPrev = ()=>{
+
+        if(!playing_track_id)return
+        const {current} = audio
+
+        if(current.currentTime>1){
+            current.currentTime = 0
+            return
+        }
+
+        let prevIndx = current_playlist?.findIndex(c=> c.id === playing_track_id) - 1
+        if(prevIndx < 0 ){
+            
+            current.src = ''
+            return
+        }
+
+        const track = current_playlist[prevIndx]
+
+        dispatch({
+            type: 'SET_PLAYING_TRACK',
+            playing_track_id: track?.id
+        })
+        setPlayingTrack(track)
+
+        current.src = track?.preview_url
+        dispatch({
+            type: 'SET_PLAY_PAUSE',
+            playing: true
+        })
+    }
+
+    const handleSuffle = ()=>{
+
+        let c_playlist: any[] = dupCurrent_playlist
+        
+        if(!shuffle){
+            let track = null
+            const shuffled_playlist = suffleArray(current_playlist).filter((c:{id:string})=>{
+                if(c.id !== playing_track_id)return c
+                track = c
+            })
+
+            c_playlist = [track, ...shuffled_playlist]
+        }
+
+        setCurrent_playlist(c_playlist)
+
+        dispatch({
+            type: 'SET_SHUFFLE',
+            shuffle: !shuffle
+        })
+    }
+
+    const handleRepeat = ()=>{
+
+        dispatch({
+            type: 'SET_REPEAT',
+            repeat: !repeat
+        })
+    }
+
+    const handlePlayerTimeUpdate = ()=>{
+        const fullDuration = audio.current.duration
+        const currentTime = audio.current.currentTime
+        
+        setPlayTime((currentTime/fullDuration)*100)
+    }
+
+    const playTimeHandler = (e:any)=>{
+        if(!playing_track_id)return
+        
+        const playTime = (e.nativeEvent.offsetX/e.target.clientWidth)*100
+        const fullDuration = audio.current.duration
+        setPlayTime(playTime)
+        audio.current.currentTime = (playTime/100)*fullDuration
+    }
+
+    const handleVolume:any = (event: any, newValue: number | number[])=>{
+        setVolume(newValue as number)
+        audio.current.volume = typeof(newValue)==='number'?newValue/100: newValue[0]/100
+        localStorage.setItem('volume', `${typeof(newValue)==='number'?newValue/100: newValue[0]/100}`)
+    }
 
     return (
         <div className={styles.footer}>
             <div className={styles.footer__left}>
                 <span className={styles.footer__albumImg}>
-                    <Image src="/music.jpg" alt="song album" height={60} width={60} />
+                    {
+                        playingTrack?.images[0]?.url && (
+                            <Image src={playingTrack?.images[0]?.url} alt="song album" height={60} width={60} />
+                        )
+                    }
                 </span>
                 <div className={styles.footer__songInfo}>
-                    <h4>Kine</h4>
-                    <p>Rihanna</p>
+                    <h4>{playingTrack?.name}</h4>
+                    <p>{playingTrack?.artists?.map((c:{name:string})=>c.name).join(' ')}</p>
                 </div>
             </div>
             <div className={styles.footer__center}>
                 <div className={styles.footer__center_btns}>
-                    <Shuffle className={`${styles.footer__icon} ${shuffle && styles.footer__green}`}  />
-                    <SkipPrevious className={styles.footer__icon} />
+                    <Shuffle onClick={handleSuffle} className={`${styles.footer__icon} ${shuffle && styles.footer__green}`}  />
+                    <SkipPrevious onClick={playPrev} className={styles.footer__icon} />
                     {
                         !playing? (
                             <PlayCircleOutlineOutlined onClick={handlePlayPause} style={{ fontSize: '4rem' }} className={styles.footer__icon} />
@@ -148,9 +245,9 @@ const Footer = () => {
                         )
                     }
                     <SkipNext onClick={playNext} className={styles.footer__icon} />
-                    <Repeat className={`${styles.footer__icon} ${repeat && styles.footer__green}`} />
+                    <Repeat onClick={handleRepeat} className={`${styles.footer__icon} ${repeat && styles.footer__green}`} />
                 </div>
-                <MediaProgress/>
+                <MediaProgress playTime={playTime} playTimeHandler={playTimeHandler}/>
             </div>
             <div className={styles.footer__right}>
                 <Grid container spacing={2} >
@@ -166,13 +263,13 @@ const Footer = () => {
                     </Grid>
                     <Grid item xs>
                         <span className={styles.footer__right_span}>
-                            <Slider style={{ color: '#1db954' }} />
+                            <Slider value={volume?volume:100} onChange={handleVolume} style={{ color: '#1db954' }} />
                         </span>
                     </Grid>
                 </Grid>
             </div>
 
-            <audio onEnded={playNext} autoPlay={true} ref={audio}/>
+            <audio onTimeUpdate={handlePlayerTimeUpdate} onEnded={playNext} autoPlay={true} ref={audio}/>
         </div>
     )
 }

@@ -1,6 +1,6 @@
 @import "../../sass/abstract/variables";
 
-.footer{
+.footer {
     background-color: #282828;
     width: 100%;
     padding: 1rem;
@@ -11,36 +11,51 @@
     overflow: hidden;
 
     &__left {
-        flex: .3;
+        flex: 0.3;
         display: flex;
         max-width: 30rem;
     }
 
-    &__albumImg{
+    &__albumImg {
         margin-right: 2rem;
         display: flex;
         align-items: center;
-        img{
+        flex: 4rem 0 auto;
+        img {
             object-fit: contain;
             max-height: 6rem;
         }
     }
 
-    &__songInfo{
+    &__songInfo {
         display: flex;
         flex-direction: column;
         justify-content: center;
         color: white;
+        overflow-x: hidden;
+        flex: 1;
+        
+        h4 {
+            overflow-x: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        p{
+            overflow-x: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
     }
-    
+
     &__center {
-        flex: .4;
+        flex: 0.4;
         max-width: 35rem;
         // display: grid;
         // background-color: tomato;
         // background-color: dodgerblue;
-        
-        &_btns{
+
+        &_btns {
             padding: 0 7rem;
             display: flex;
             justify-content: space-between;
@@ -51,26 +66,25 @@
     }
 
     &__right {
-        flex: .3;
+        flex: 0.3;
         align-items: center;
         display: flex;
         justify-content: space-between;
         max-width: 25rem;
         padding-right: 2rem;
 
-        &_span{
+        &_span {
             display: flex;
             height: 100%;
             align-items: center;
         }
     }
 
-    &__icon{
+    &__icon {
         color: grey;
-        
-        
-        &:hover{
-            transition: all .2s ease-in-out;
+
+        &:hover {
+            transition: all 0.2s ease-in-out;
             transform: scale(1.2) !important;
             color: white;
         }
@@ -79,6 +93,4 @@
     &__green {
         color: $spotify_green;
     }
-
 }
-
