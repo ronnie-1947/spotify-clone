@@ -62,7 +62,8 @@ const Footer = () => {
         }).filter((c:any)=>c)
         
         const track = current_playlist.filter((c:{id:string})=>c.id===outer_playing_track_id)?.[0]
-        console.log(track)
+        if(!track)return
+
         setDupCurrent_playlist(current_playlist)
         setPlayingTrack(track)
         
