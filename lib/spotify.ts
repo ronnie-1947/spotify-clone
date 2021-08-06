@@ -15,7 +15,7 @@ const scopes = [
     "user-read-playback-state",
     "user-top-read",
     "user-library-read",
-    "user-modify-playback-state",
+    "user-modify-playback-state", 
 ]
 
 export const getAccessCode: () => Token = () => window.location.hash.substr(1).split('&').reduce((acc: any, cur) => {
