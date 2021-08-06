@@ -2,6 +2,7 @@ import styles from './Header.module.scss'
 import React, { Fragment } from 'react'
 import { SearchOutlined } from '@material-ui/icons'
 import { Avatar } from '@material-ui/core'
+import {useRouter} from 'next/router'
 
 import { useStateContextValue } from '../../context/StateProvider'
 
@@ -16,7 +17,21 @@ interface Props {
 
 const Header = ({ user, search, setSearch}: Props) => {
 
-    const [{ current_page }] = useStateContextValue()
+    const [{ current_page }, dispatch] = useStateContextValue()
+    const router = useRouter()
+
+    const handleLogout = ()=>{
+
+        localStorage.removeItem('access_token')
+        dispatch({
+            type: 'SET_USER_N_TOKEN',
+            payload: {
+                user: null,
+                token: null
+            }
+        })
+        router.push('/login')
+    }
 
     return (
         <header className={styles.header}>
@@ -28,10 +43,15 @@ const Header = ({ user, search, setSearch}: Props) => {
                     </div>
                 </Fragment>
             ): <div></div>}
-            <div className={styles.header__right}>
-                <Avatar src={user?.images[0]?.url} alt={user?.display_name.trim()} />
-                <h4>{user?.display_name?.length > 15 ? user.display_name.substring(0, 15).trim() + '...' : user.display_name.trim()}</h4>
-            </div>
+            {user && (
+                <div className={styles.header__right}>
+                    <Avatar src={user?.images[0]?.url} alt={user?.display_name.trim()} />
+                    <h4>{user?.display_name?.length > 15 ? user.display_name.substring(0, 15).trim() + '...' : user.display_name.trim()}</h4>
+                    <div className={styles.logout}>
+                        <button onClick={handleLogout}>Logout</button>
+                    </div>
+                </div>
+            )}
         </header>
     )
 }

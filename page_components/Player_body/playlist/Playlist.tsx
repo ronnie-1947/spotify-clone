@@ -53,7 +53,7 @@ const Playlist = () => {
                 <span className={styles.body__info_img}>
                     {
                         active_playlist?.images?.[0]?.url ? (
-                            <img src={active_playlist?.images?.[0]?.url} alt={user.display_name.trim()} />
+                            <img src={active_playlist?.images?.[0]?.url} alt={user?.display_name?.trim()} />
                         ) : (
                             <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmVyc2lvbj0iMS4xIi8+" alt="transparent" />
                         )
@@ -79,8 +79,8 @@ const Playlist = () => {
                 </div>
 
                 {
-                    active_playlist?.tracks?.items.map((item: any, i: number) => (
-                        <SongRow clickHandler={playTrack} key={i} track={item?.track} />
+                    active_playlist?.tracks?.items?.filter((t:any)=>t?.track?.preview_url).map((item: any, i: number) => (
+                        <SongRow position={i} clickHandler={playTrack} key={i} track={item?.track} />
                     ))
                 }
             </div>
