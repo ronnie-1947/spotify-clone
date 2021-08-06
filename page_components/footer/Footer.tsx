@@ -214,7 +214,7 @@ const Footer = () => {
     }
 
     const handleVolume: any = (event: any, newValue: number | number[]) => {
-        if(newValue > 100 || newValue < .1) return
+        if(newValue > 100 || newValue < .01) return
         setVolume(newValue as number)
     }
 
@@ -264,8 +264,8 @@ const Footer = () => {
                     </Grid>
                     <Grid item>
                         <span className={styles.footer__right_span}>
-                            {volume > 10 ? (
-                                <VolumeDown onClick = {()=>setVolume(.1)} className={styles.footer__icon} />
+                            {volume > .1 ? (
+                                <VolumeDown onClick = {()=>setVolume(.01)} className={styles.footer__icon} />
                             ) : (
                                 <VolumeMute onClick = {()=>setVolume(30)} className={styles.footer__icon} />
                             )}
