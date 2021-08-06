@@ -7,7 +7,7 @@ interface Token {
 }
 
 export const authEndPoint: string = 'https://accounts.spotify.com/authorize'
-const redirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_VERCEL_URL ? process.env.NEXT_PUBLIC_VERCEL_URL : '')
+const redirectUri = process.env.NEXT_PUBLIC_MODE === 'production'?encodeURIComponent(process.env.NEXT_PUBLIC_VERCEL_URL ?`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/` : ''):encodeURIComponent(process.env.NEXT_PUBLIC_VERCEL_URL ? process.env.NEXT_PUBLIC_VERCEL_URL : '')
 const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID
 const scopes = [
     "user-read-currently-playing",
