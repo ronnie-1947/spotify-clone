@@ -46,7 +46,7 @@ const Header = ({ user, search, setSearch}: Props) => {
             ): <div></div>}
             {user && (
                 <div className={styles.header__right}>
-                    <Avatar src={user?.images[0]?.url} alt={user?.display_name.trim()} />
+                    <Avatar src={user?.images?.[0]?.url} alt={user?.display_name.trim()} />
                     <h4>{user?.display_name?.length > 15 ? user.display_name.substring(0, 15).trim() + '...' : user.display_name.trim()}</h4>
                     <div className={styles.logout}>
                         <button onClick={handleLogout}>Logout</button>

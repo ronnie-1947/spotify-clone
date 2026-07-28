@@ -231,8 +231,8 @@ const Footer = () => {
             <div className={styles.footer__left}>
                 <span className={styles.footer__albumImg}>
                     {
-                        playingTrack?.images[0]?.url && (
-                            <Image src={playingTrack?.images[0]?.url} alt="song album" height={60} width={60} />
+                        playingTrack?.images?.[0]?.url && (
+                            <Image src={playingTrack?.images?.[0]?.url} alt="song album" height={60} width={60} />
                         )
                     }
                 </span>

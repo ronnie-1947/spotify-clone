@@ -94,7 +94,8 @@ const SearchRow = ({ row, heading }: Props) => {
             <div className={`${more ? styles.songRow__cardsAll : styles.songRow__cards}`}>
                 {
                     row?.map((lib: any) => {
-                        if (!lib || !lib.images[0] || !lib.images[0].url) return null
+                        // `images` comes back as null, not [], for playlists with no cover art
+                        if (!lib?.images?.[0]?.url) return null
                         return (
                             <div onClick={() => clickHandler(lib, heading)} key={lib.id} className={styles.card}>
                                 <span className={heading === 'artists' ? styles.card__imgContainerRounded : ''}>

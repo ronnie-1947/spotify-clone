@@ -49,7 +49,9 @@ const SongRow = ({ track, position, clickHandler }: Props) => {
                 )
             }
             <div onClick={() => clickHandler(track)} className={styles.song}>
-                <Image src={track?.album?.images[0]?.url} alt={track?.name} height={50} width={50} />
+                {track?.album?.images?.[0]?.url && (
+                    <Image src={track?.album?.images?.[0]?.url} alt={track?.name} height={50} width={50} />
+                )}
                 <div className={styles.song__info}>
                     <h1>{track.name}</h1>
                     <p>
