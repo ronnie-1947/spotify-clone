@@ -3,6 +3,7 @@ import styles from './Sidebar.module.scss'
 import Image from 'next/image'
 
 import spotify from '../../lib/api_spotify'
+import { getDefaultPlaylist } from '../../lib/playlists'
 
 import SidebarOption from '../../components/sidebarOption/SidebarOption'
 import { HomeOutlined, SearchOutlined, LibraryMusicOutlined } from '@mui/icons-material'
@@ -21,11 +22,8 @@ const Sidebar = () => {
         })
 
         if (page === 'home') {
-            spotify.searchPlaylists('discover weekly').then(async ({ playlists }: any) => {
-                if (!playlists) return
-                const id = playlists?.items?.[0]?.id
-
-                const tracks = await spotify.getPlaylist(id ? id : '37i9dQZEVXcKatfd95a3vi')
+            getDefaultPlaylist().then(tracks => {
+                if (!tracks) return
 
                 dispatch({
                     type: 'SET_ACTIVE_PLAYLIST',
@@ -70,7 +68,7 @@ const Sidebar = () => {
 
             <div className={styles.sidebar__playlists}>
                 {
-                    playlists?.playlists?.items?.map((playlist: { name: string, id: string }) => (
+                    playlists?.map((playlist: { name: string, id: string }) => (
                         <SidebarOption key={playlist.id} title={playlist.name} clickHandler={handlePlaylistChange} id={playlist.id} Icon={null} highlight={current_page==='playlist' && active_playlist.name === playlist.name} />
                     ))
                 }

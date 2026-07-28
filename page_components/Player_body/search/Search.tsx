@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import styles from './Search.module.scss'
 
 import spotify from '../../../lib/api_spotify'
+import { getOwnPlaylists, usable } from '../../../lib/playlists'
 import SearchRow from '../../../components/searchRow/SearchRow'
 
 interface Props {
@@ -20,10 +21,12 @@ const Search = ({searchStr}:Props) => {
         const timer = setTimeout(async() => {
             
             if(!searchStr){
-                const playlists: any = await spotify.getFeaturedPlaylists()
+                // Featured playlists are gone from the Web API — the user's own
+                // stand in as the landing state instead.
+                const playlists: any = await getOwnPlaylists()
                 const artists: any = await spotify.getMyTopArtists()
-                
-                setPlaylists(playlists?.playlists?.items)
+
+                setPlaylists(playlists)
                 setArtists(artists?.items)
                 return
             }
@@ -36,7 +39,8 @@ const Search = ({searchStr}:Props) => {
 
             setArtists(artists?.artists?.items)
             setAlbums(albums?.albums?.items)
-            setPlaylists(playlists?.playlists?.items)
+            // Spotify-owned hits come back as nulls, or as entries that 404 when opened
+            setPlaylists(usable(playlists?.playlists?.items))
             setShows(shows?.shows?.items)
 
         }, 500);

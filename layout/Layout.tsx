@@ -12,6 +12,7 @@ import {
     getValidAccessToken,
 } from '../lib/spotify'
 import spotify from '../lib/api_spotify'
+import { getDefaultPlaylist, getOwnPlaylists } from '../lib/playlists'
 import { useStateContextValue } from '../context/StateProvider'
 
 import Spinner from '../components/loading/Loading'
@@ -108,22 +109,18 @@ const Common = ({ children }: Props) => {
 
                     // console.log(song)
                 })
-                spotify.searchPlaylists('discover weekly').then( async ({playlists}:any)=>{
-                    if(!playlists)return
-                    const id = playlists?.items?.[0]?.id
-
-                    const tracks = await spotify.getPlaylist(id?id:'37i9dQZEVXcKatfd95a3vi')
-                    // const tracks = await spotify.getPlaylist('15ngsvOmlTkARCg7ipoNvG')
+                getOwnPlaylists().then(playlists=>{
+                    dispatch({
+                        type: 'SET_PLAYLISTS',
+                        playlists
+                    })
+                    return getDefaultPlaylist(playlists)
+                }).then(tracks=>{
+                    if(!tracks)return
 
                     dispatch({
                         type: 'SET_ACTIVE_PLAYLIST',
                         active_playlist: tracks
-                    })
-                })
-                spotify.getFeaturedPlaylists().then((playlists)=>{
-                    dispatch({
-                        type: 'SET_PLAYLISTS',
-                        playlists
                     })
                 })
 
