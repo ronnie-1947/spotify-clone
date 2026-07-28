@@ -1,7 +1,7 @@
 import styles from './Header.module.scss'
 import React, { Fragment } from 'react'
-import { SearchOutlined } from '@material-ui/icons'
-import { Avatar } from '@material-ui/core'
+import { SearchOutlined } from '@mui/icons-material'
+import { Avatar } from '@mui/material'
 import {useRouter} from 'next/router'
 
 import { useStateContextValue } from '../../context/StateProvider'

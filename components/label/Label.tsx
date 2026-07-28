@@ -1,7 +1,7 @@
 import {Fragment} from 'react'
 import styles from './Label.module.scss'
 
-import FavoriteIcon from '@material-ui/icons/Favorite';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const Label = () => {
     return (

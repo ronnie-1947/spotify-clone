@@ -4,44 +4,47 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-A Spotify web client clone built with Next.js 11 (pages router) and TypeScript, styled with SCSS modules, using Material-UI (v4) for icons/components and `spotify-web-api-js` as the Spotify Web API wrapper.
+A Spotify web client clone built with Next.js 16 (Pages Router, Turbopack) and TypeScript, styled with SCSS modules, using MUI v9 for icons/a few controls and `spotify-web-api-js` as the Spotify Web API wrapper.
 
 ## Commands
 
 ```bash
-yarn dev      # start dev server (http://localhost:3000)
-yarn build    # production build
-yarn start    # run production build
-yarn lint     # next lint (eslint-config-next)
+npm run dev        # start dev server (http://localhost:3000)
+npm run build      # production build
+npm run start      # run production build
+npm run lint       # eslint . (flat config)
+npm run typecheck  # tsc --noEmit
 ```
 
 There is no test suite configured in this repo.
 
-Note: `package-lock.json` and `yarn.lock` are both present; the project has historically used yarn (scripts reference `yarn` in this doc, but either package manager works since both lockfiles exist).
+Node >= 20.9 is required (`engines` + `.nvmrc` pin 24). npm is the package manager — `package-lock.json` is the only lockfile; don't add a `yarn.lock` alongside it, since two lockfiles make Vercel's package-manager detection ambiguous.
 
 ## Environment variables
 
 Auth/config is driven entirely by env vars (see [lib/spotify.ts](lib/spotify.ts)):
 
 - `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` — Spotify app client ID
-- `NEXT_PUBLIC_VERCEL_URL` — used to build the OAuth redirect URI
-- `NEXT_PUBLIC_MODE` — when set to `'production'`, the redirect URI is built as `https://${NEXT_PUBLIC_VERCEL_URL}/`; otherwise it uses `NEXT_PUBLIC_VERCEL_URL` as-is (for local dev over http)
+- `NEXT_PUBLIC_VERCEL_URL` — optional. Used to build the OAuth redirect URI; accepts a value with or without protocol/trailing slash and normalizes it (http for localhost, https otherwise). When unset, `getRedirectUri()` falls back to `window.location.origin`, which is the right answer in the browser.
+
+The redirect URI must match a URI registered on the Spotify dashboard character for character, and must be identical in the `/authorize` request and the token exchange.
 
 ## Architecture
 
-### Auth flow (implicit grant, no backend)
+### Auth flow (Authorization Code + PKCE, no backend)
 
-This app has no server-side auth — it uses Spotify's implicit-grant OAuth flow entirely client-side:
+There is no server-side auth — the whole OAuth flow runs in the browser, with `localStorage` as the token store. All of it lives in [lib/spotify.ts](lib/spotify.ts):
 
-1. [pages/login/index.tsx](pages/login/index.tsx) renders a login link built from `loginUrl` in [lib/spotify.ts](lib/spotify.ts), which redirects to Spotify's `/authorize` endpoint.
-2. Spotify redirects back to `/` with the access token in the URL hash fragment.
-3. [layout/Layout.tsx](layout/Layout.tsx) (the `Common` component, wrapped around every page) reads the token from the hash via `getAccessCode()`, falling back to `localStorage.getItem('access_token')`. It then:
-   - sets the token on the shared `spotify` client singleton ([lib/api_spotify.ts](lib/api_spotify.ts))
-   - calls `spotify.getMe()` to validate the token and load the user
-   - dispatches `SET_USER_N_TOKEN` into global state and persists the token to `localStorage`
-   - redirects to `/login` on failure (invalid/expired token), or to `/` on success
-   - kicks off initial data loads: current playback, a "discover weekly" search fallback used as the default active playlist, and featured playlists
-4. All pages are expected to be wrapped in `<Layout>` (see [pages/index.tsx](pages/index.tsx), [pages/login/index.tsx](pages/login/index.tsx)) — this is what gates rendering on auth state and shows a spinner while resolving it.
+1. [page_components/Login_/login/Login.tsx](page_components/Login_/login/Login.tsx) calls `redirectToLogin()` on click. The `/authorize` URL can only be built at click time because the PKCE code challenge is generated asynchronously (`crypto.subtle.digest`); the verifier is stashed in `localStorage` for the callback.
+2. Spotify redirects back to the app with `?code=...` (or `?error=...`) in the query string.
+3. [layout/Layout.tsx](layout/Layout.tsx) (the `Common` component, wrapped around every page) resolves a token on mount:
+   - `?error=` → clear tokens, go to `/login`
+   - `?code=` → `exchangeCodeForToken()` (POSTs to Spotify's `/api/token` with the stored verifier), then strips the query params via `history.replaceState`
+   - otherwise → `getValidAccessToken()`, which refreshes via the stored refresh token when the access token is missing or within `EXPIRY_MARGIN` (60s) of expiring
+4. With a token it sets the shared `spotify` client's token, calls `getMe()` to validate and load the user, dispatches `SET_USER_N_TOKEN`, and starts a `setInterval` (every 5 min) that keeps the token fresh while the app stays open. It then kicks off initial data loads: current playback, a "discover weekly" search used as the default active playlist, and featured playlists.
+5. All pages must be wrapped in `<Layout>` (see [pages/index.tsx](pages/index.tsx), [pages/login/index.tsx](pages/login/index.tsx)) — this is what gates rendering on auth and shows a spinner while resolving. Because auth is resolved in an effect, the server-rendered HTML for every route is just that spinner.
+
+Token/verifier storage keys and all refresh logic are centralized in `lib/spotify.ts` — go through `getValidAccessToken()` / `clearTokens()` rather than touching `localStorage` directly.
 
 ### Global state
 
@@ -54,7 +57,7 @@ State is a single React Context + `useReducer` store, not Redux:
 
 ### Spotify API access
 
-[lib/api_spotify.ts](lib/api_spotify.ts) exports a single shared `spotify` instance (`spotify-web-api-js`). Its access token is set once in `Layout.tsx` after auth; all other components import this same singleton and call methods directly (e.g. `spotify.getPlaylist()`, `spotify.searchPlaylists()`) rather than going through API routes — there's no backend proxy for Spotify calls.
+[lib/api_spotify.ts](lib/api_spotify.ts) exports a single shared `spotify` instance (`spotify-web-api-js`). Its access token is set in `Layout.tsx` after auth (and refreshed on the interval); all other components import this same singleton and call methods directly (e.g. `spotify.getPlaylist()`, `spotify.searchPlaylists()`) rather than going through API routes — there's no backend proxy for Spotify calls.
 
 ### Playback
 
@@ -67,10 +70,13 @@ Audio playback is handled entirely in [page_components/footer/Footer.tsx](page_c
 - `page_components/` — larger, route-specific composite components (sidebar, footer, player body and its sub-views: library/playlist/search, login).
 - `components/` — smaller shared/presentational components (header, song row, search row, sidebar option, media progress, loading spinner, etc).
 - `context/` — global state (provider + reducer).
-- `lib/` — Spotify auth helpers and the shared `spotify-web-api-js` client instance.
-- `sass/` — shared SCSS abstracts (`abstract/_variables.scss`, `abstract/_mixin.scss`) and base styles, imported into `styles/globals.scss`. Individual components use co-located `*.module.scss` CSS modules.
+- `lib/` — Spotify auth/PKCE helpers and the shared `spotify-web-api-js` client instance.
+- `sass/` — shared SCSS abstracts (`abstract/_variables.scss`, `abstract/_mixin.scss`) and base styles, pulled into `styles/globals.scss`. Individual components use co-located `*.module.scss` CSS modules.
 
-## Notes
+## Conventions and gotchas
 
-- `tsconfig.json` targets `es5` with `strict: true`.
-- Material-UI v4 (`@material-ui/core`, `@material-ui/icons`) is used for icons and a few controls (e.g. the volume `Slider`, `Grid`) — not for full-scale theming.
+- **Sass uses `@use`, not `@import`.** `@use` is not transitive, so every partial must load its own dependencies — e.g. `sass/base/_base.scss` pulls in `../abstract/mixin` itself. Files needing shared values use `@use "<path>/variables" as *` so `$spotify_green` / `respond()` stay unqualified.
+- **Linting is ESLint flat config** ([eslint.config.mjs](eslint.config.mjs)) run via the ESLint CLI — `next lint` was removed in Next 16. `@typescript-eslint/no-explicit-any` and `react-hooks/set-state-in-effect` are deliberately downgraded to warnings: Spotify payloads are consumed untyped throughout, and Footer's `<audio>` syncing legitimately sets state from effects. Lint is expected to pass with ~65 warnings; keep it at zero *errors*.
+- **`next/image` needs `remotePatterns`** in [next.config.js](next.config.js) for any new remote host (`images.domains` was removed in Next 16). Spotify art comes from `**.scdn.co`.
+- **`overrides` in package.json** force patched `sharp` and `postcss` versions that Next's own dependency ranges lag behind — they exist to keep `npm audit --omit=dev` clean. Re-check them when upgrading Next.
+- MUI v9 (`@mui/material`, `@mui/icons-material`, with Emotion) is used only for icons and a few controls (volume `Slider`, `Grid`, `Avatar`) — there's no theme provider. Note the v9 `Grid` API uses `size` (e.g. `size="grow"`); the old `item` / `xs` props are gone.

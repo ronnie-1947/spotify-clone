@@ -1,6 +1,15 @@
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['platform-lookaside.fbsbx.com', 'i.scdn.co', 'mosaic.scdn.co', 'thisis-images.scdn.co']
-  }
+    // `images.domains` was removed in Next 16 -- remotePatterns is the replacement.
+    // Spotify serves album art from a number of *.scdn.co subdomains (i, mosaic,
+    // thisis-images, ...), so match the wildcard rather than listing them one by one.
+    remotePatterns: [
+      { protocol: 'https', hostname: '**.scdn.co' },
+      { protocol: 'https', hostname: 'platform-lookaside.fbsbx.com' },
+    ],
+  },
 }
+
+module.exports = nextConfig

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import spotify from '../../lib/api_spotify'
 
 import SidebarOption from '../../components/sidebarOption/SidebarOption'
-import { HomeOutlined, SearchOutlined, LibraryMusicOutlined } from '@material-ui/icons'
+import { HomeOutlined, SearchOutlined, LibraryMusicOutlined } from '@mui/icons-material'
 import { useStateContextValue } from '../../context/StateProvider'
 
 

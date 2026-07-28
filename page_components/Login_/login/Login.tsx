@@ -18,7 +18,7 @@ const Login = () => {
     return (
         <div className={styles.login}>
             <span className={styles.logo}>
-                <Image src="/spotify_logo_white_big.png" height={150} width={500}/>
+                <Image src="/spotify_logo_white_big.png" alt="Spotify" height={150} width={500}/>
             </span>
             <div className={styles.login__container}>
                 <Button onClick={handleLogin}>Login With Spotify</Button>

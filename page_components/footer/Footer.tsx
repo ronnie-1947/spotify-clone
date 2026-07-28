@@ -3,16 +3,16 @@ import styles from './Footer.module.scss'
 import Image from 'next/image'
 import { useStateContextValue } from '../../context/StateProvider'
 
-import { PlayCircleOutlineOutlined, PauseCircleFilledOutlined, VolumeMute, SkipPrevious, SkipNext, PlaylistPlay, Shuffle, Repeat, VolumeDown } from '@material-ui/icons'
-import { Grid, Slider } from '@material-ui/core'
+import { PlayCircleOutlineOutlined, PauseCircleFilledOutlined, VolumeMute, SkipPrevious, SkipNext, PlaylistPlay, Shuffle, Repeat, VolumeDown } from '@mui/icons-material'
+import { Grid, Slider } from '@mui/material'
 import MediaProgress from '../../components/mediaProgress/MediaProgress'
 
 const suffleArray: (arr: any[]) => any[] = (pointerarr) => {
 
-    let newPos, temp, arr = [...pointerarr]
+    const arr = [...pointerarr]
     arr.forEach((_, indx) => {
-        newPos = Math.floor(Math.random() * arr.length)
-        temp = arr[newPos]
+        const newPos = Math.floor(Math.random() * arr.length)
+        const temp = arr[newPos]
         arr[newPos] = arr[indx]
         arr[indx] = temp
     })
@@ -22,7 +22,7 @@ const suffleArray: (arr: any[]) => any[] = (pointerarr) => {
 const Footer = () => {
 
     const [{ active_playlist, shuffle, outer_playing_track_id, repeat, playing_playlist_id, playing_track_id, playing }, dispatch] = useStateContextValue()
-    const audio = useRef<any>()
+    const audio = useRef<any>(null)
 
     const [current_playlist, setCurrent_playlist] = useState<any[]>([])
     const [dupCurrent_playlist, setDupCurrent_playlist] = useState([])
@@ -145,7 +145,7 @@ const Footer = () => {
             return
         }
 
-        let prevIndx = current_playlist?.findIndex(c => c.id === playing_track_id) - 1
+        const prevIndx = current_playlist?.findIndex(c => c.id === playing_track_id) - 1
         if (prevIndx < 0) {
 
             current.src = ''
@@ -213,14 +213,16 @@ const Footer = () => {
         audio.current.currentTime = (playTime / 100) * fullDuration
     }
 
-    const handleVolume: any = (event: any, newValue: number | number[]) => {
-        if(newValue > 100 || newValue < .01) return
-        setVolume(newValue as number)
+    // Slider hands back number[] for range sliders -- this one has a single thumb
+    const handleVolume = (_event: Event, newValue: number | number[]) => {
+        const value = Array.isArray(newValue) ? newValue[0] : newValue
+        if (value > 100 || value < .01) return
+        setVolume(value)
     }
 
     useEffect(()=>{
-        audio.current.volume = typeof (volume) === 'number' ? volume / 100 : volume[0] / 100
-        localStorage.setItem('volume', `${typeof (volume) === 'number' ? volume / 100 : volume[0] / 100}`)
+        audio.current.volume = volume / 100
+        localStorage.setItem('volume', `${volume / 100}`)
     }, [volume])
 
 
@@ -257,12 +259,12 @@ const Footer = () => {
             </div>
             <div className={styles.footer__right}>
                 <Grid container spacing={2} >
-                    <Grid item>
+                    <Grid>
                         <span className={styles.footer__right_span}>
                             <PlaylistPlay className={styles.footer__icon} />
                         </span>
                     </Grid>
-                    <Grid item>
+                    <Grid>
                         <span className={styles.footer__right_span}>
                             {volume > .1 ? (
                                 <VolumeDown onClick = {()=>setVolume(.01)} className={styles.footer__icon} />
@@ -271,7 +273,7 @@ const Footer = () => {
                             )}
                         </span>
                     </Grid>
-                    <Grid item xs>
+                    <Grid size="grow">
                         <span className={styles.footer__right_span}>
                             <Slider value={volume ? volume : 100} onChange={handleVolume} style={{ color: '#1db954' }} />
                         </span>

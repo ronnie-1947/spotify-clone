@@ -1,4 +1,4 @@
-@import "../../sass/abstract/variables";
+@use "../../sass/abstract/variables" as *;
 
 .progress_container {
     height: 5px;

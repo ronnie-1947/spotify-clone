@@ -2,7 +2,7 @@ import React, { Fragment } from 'react'
 import styles from './Playlist.module.scss'
 import { useStateContextValue } from '../../../context/StateProvider'
 
-import { PlayCircleFilled, PauseCircleFilled } from '@material-ui/icons'
+import { PlayCircleFilled, PauseCircleFilled } from '@mui/icons-material'
 import SongRow from '../../../components/songRow/SongRow'
 
 const Playlist = () => {

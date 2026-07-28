@@ -1,9 +1,5 @@
 import React, {createContext, useContext, useReducer} from 'react'
 
-interface app {
-
-}
-
 interface Props {
     children: React.ReactNode;
     reducer: any;

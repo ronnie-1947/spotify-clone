@@ -1,5 +1,5 @@
-@import '../button_common.scss';
-@import '../../../sass/abstract/variables';
+@use '../button_common' as *;
+@use '../../../sass/abstract/variables' as *;
 
 .btn{
     @include btn_commons;

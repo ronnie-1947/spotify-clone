@@ -1,4 +1,4 @@
-@import "../../sass/abstract/variables";
+@use "../../sass/abstract/variables" as *;
 
 .body{
     background: linear-gradient(rgb(91, 87, 115), rgba(0,0,0,1));

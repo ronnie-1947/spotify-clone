@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './SongRow.module.scss'
 import Image from 'next/image'
-import { PlayCircleFilled, PauseCircleFilled } from '@material-ui/icons'
+import { PlayCircleFilled, PauseCircleFilled } from '@mui/icons-material'
 
 import { useStateContextValue } from '../../context/StateProvider'
 

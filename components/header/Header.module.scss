@@ -1,4 +1,4 @@
-@import "../../sass/abstract/mixin";
+@use "../../sass/abstract/mixin" as *;
 
 .header{
     display: flex;

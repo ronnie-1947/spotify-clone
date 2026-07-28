@@ -1,4 +1,4 @@
-@import "../sass/abstract/mixin";
-
-@import "../sass/base/base";
-@import "../sass/base/typography";
+// Each partial now loads its own dependencies -- @use is not transitive the way
+// @import was, so the responsive mixins are pulled in by sass/base/_base.scss.
+@use "../sass/base/base";
+@use "../sass/base/typography";
