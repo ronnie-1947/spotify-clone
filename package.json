@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider next dev",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider next build",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -17,6 +17,7 @@
     "spotify-web-api-js": "^1.5.1"
   },
   "devDependencies": {
+    "@types/node": "16.3.3",
     "@types/react": "17.0.14",
     "eslint": "7.31.0",
     "eslint-config-next": "11.0.1",

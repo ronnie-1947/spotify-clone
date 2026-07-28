@@ -3,7 +3,14 @@ import styles from './Layout.module.scss'
 
 import { useRouter } from 'next/router'
 
-import { getAccessCode } from '../lib/spotify'
+import {
+    clearAuthParams,
+    clearTokens,
+    exchangeCodeForToken,
+    getAuthCode,
+    getAuthError,
+    getValidAccessToken,
+} from '../lib/spotify'
 import spotify from '../lib/api_spotify'
 import { useStateContextValue } from '../context/StateProvider'
 
@@ -13,11 +20,8 @@ interface Props {
     children: React.ReactNode;
 }
 
-interface Token {
-    access_token: string | undefined | null;
-    expires_in: string | undefined;
-    token_type: string | undefined;
-}
+// How often we check whether the access token is close to expiring
+const REFRESH_INTERVAL = 5 * 60 * 1000
 
 
 const Common = ({ children }: Props) => {
@@ -25,23 +29,54 @@ const Common = ({ children }: Props) => {
     const router = useRouter()
     const [{}, dispatch] = useStateContextValue()
     const [loading, setLoading] = useState(true)
-    
-    useEffect(() => {   
 
-        // Get Access Token from hash or local storage
-        let { access_token }: Token = getAccessCode()
+    useEffect(() => {
 
-        if (!access_token) {
-            access_token = localStorage.getItem('access_token')
+        let refreshTimer: ReturnType<typeof setInterval>
+
+        const goToLogin = () => {
+            if (router.pathname !== '/login') {
+                router.push('/login')
+            }
+            setLoading(false)
         }
 
-        window.location.hash = ''
+        // Authorization Code flow with PKCE: Spotify sends us back a ?code=... to exchange for tokens
+        const resolveAccessToken = async (): Promise<string | null> => {
 
-        if (access_token) {
+            if (getAuthError()) {
+                clearAuthParams()
+                clearTokens()
+                return null
+            }
+
+            const code = getAuthCode()
+
+            if (code) {
+                try {
+                    const access_token = await exchangeCodeForToken(code)
+                    clearAuthParams()
+                    return access_token
+                } catch (err) {
+                    clearAuthParams()
+                    clearTokens()
+                    return null
+                }
+            }
+
+            return getValidAccessToken()
+        }
+
+        resolveAccessToken().then(access_token => {
+
+            if (!access_token) {
+                goToLogin()
+                return
+            }
 
             spotify.setAccessToken(access_token)
             spotify.getMe().then(user => {
-                
+
                 // Store the user and token
                 dispatch({
                     type: 'SET_USER_N_TOKEN',
@@ -50,30 +85,36 @@ const Common = ({ children }: Props) => {
                         token: access_token
                     }
                 })
-                
-                // Store access_token in local Storage
-                localStorage.setItem('access_token', access_token ? access_token : '')
-                
+
+                // Keep the token fresh while the app stays open
+                refreshTimer = setInterval(() => {
+                    getValidAccessToken().then(token => {
+                        if (token) {
+                            spotify.setAccessToken(token)
+                        }
+                    })
+                }, REFRESH_INTERVAL)
+
                 if (router.pathname !== '/') {
                     router.push('/')
                 }
                 setLoading(false)
-                
+
                 //  Get the users playlist
                 spotify.getMyCurrentPlayingTrack().then((song:any)=>{
                     if(!song){
                         return
                     }
-                     
+
                     // console.log(song)
                 })
                 spotify.searchPlaylists('discover weekly').then( async ({playlists}:any)=>{
                     if(!playlists)return
                     const id = playlists?.items?.[0]?.id
-                    
+
                     const tracks = await spotify.getPlaylist(id?id:'37i9dQZEVXcKatfd95a3vi')
                     // const tracks = await spotify.getPlaylist('15ngsvOmlTkARCg7ipoNvG')
-                    
+
                     dispatch({
                         type: 'SET_ACTIVE_PLAYLIST',
                         active_playlist: tracks
@@ -85,22 +126,20 @@ const Common = ({ children }: Props) => {
                         playlists
                     })
                 })
-                
+
             }).catch(err => {
-                
-                localStorage.clear()
-                if (router.pathname !== '/login') {
-                    router.push('/login')
-                }
-                
+
+                clearTokens()
+                goToLogin()
+
             })
 
-        }
-        else {
-            if (router.pathname !== '/login') {
-                router.push('/login')
+        })
+
+        return () => {
+            if (refreshTimer) {
+                clearInterval(refreshTimer)
             }
-            setLoading(false)
         }
 
     }, [dispatch])

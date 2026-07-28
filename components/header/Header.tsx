@@ -5,6 +5,7 @@ import { Avatar } from '@material-ui/core'
 import {useRouter} from 'next/router'
 
 import { useStateContextValue } from '../../context/StateProvider'
+import { clearTokens } from '../../lib/spotify'
 
 interface Props {
     user: {
@@ -22,7 +23,7 @@ const Header = ({ user, search, setSearch}: Props) => {
 
     const handleLogout = ()=>{
 
-        localStorage.removeItem('access_token')
+        clearTokens()
         dispatch({
             type: 'SET_USER_N_TOKEN',
             payload: {

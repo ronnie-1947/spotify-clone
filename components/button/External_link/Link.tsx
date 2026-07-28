@@ -3,12 +3,13 @@ import styles from './Link.module.scss'
 
 interface Props {
     children: React.ReactNode;
-    link: string;
+    link?: string;
+    onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
-const Link = ({link, children}:Props) => {
+const Link = ({link, onClick, children}:Props) => {
     return (
-        <a className={styles.btn} href={link}>
+        <a className={styles.btn} href={link ? link : '#'} onClick={onClick}>
             {children}
         </a>
     )
