@@ -98,7 +98,6 @@ const Footer = () => {
         const derivedVolume = localStorage.getItem('volume')
         if (!derivedVolume) return
         setVolume(+derivedVolume * 100)
-        audio.current.volume = +derivedVolume
     }, [])
 
     useEffect(() => {
@@ -241,16 +240,21 @@ const Footer = () => {
         audio.current.currentTime = (playTime / 100) * fullDuration
     }
 
+    // Persisted here rather than in an effect on `volume`: that effect fires on the
+    // first commit too, overwriting the restored value with the default.
+    const changeVolume = (value: number) => {
+        const clamped = Math.min(100, Math.max(0, value))
+        setVolume(clamped)
+        localStorage.setItem('volume', `${clamped / 100}`)
+    }
+
     // Slider hands back number[] for range sliders -- this one has a single thumb
     const handleVolume = (_event: Event, newValue: number | number[]) => {
-        const value = Array.isArray(newValue) ? newValue[0] : newValue
-        if (value > 100 || value < .01) return
-        setVolume(value)
+        changeVolume(Array.isArray(newValue) ? newValue[0] : newValue)
     }
 
     useEffect(()=>{
         audio.current.volume = volume / 100
-        localStorage.setItem('volume', `${volume / 100}`)
     }, [volume])
 
 
@@ -286,7 +290,9 @@ const Footer = () => {
                 <MediaProgress playTime={playTime} playTimeHandler={playTimeHandler} />
             </div>
             <div className={styles.footer__right}>
-                <Grid container spacing={2} >
+                {/* v9's Grid container dropped v4's `width: 100%`, so a `size="grow"`
+                    child (flex-basis: 0) collapsed the slider to a hairline. */}
+                <Grid container spacing={2} sx={{ width: '100%' }} >
                     <Grid>
                         <span className={styles.footer__right_span}>
                             <PlaylistPlay className={styles.footer__icon} />
@@ -294,16 +300,16 @@ const Footer = () => {
                     </Grid>
                     <Grid>
                         <span className={styles.footer__right_span}>
-                            {volume > .1 ? (
-                                <VolumeDown onClick = {()=>setVolume(.01)} className={styles.footer__icon} />
+                            {volume > 0 ? (
+                                <VolumeDown onClick = {()=>changeVolume(0)} className={styles.footer__icon} />
                             ) : (
-                                <VolumeMute onClick = {()=>setVolume(30)} className={styles.footer__icon} />
+                                <VolumeMute onClick = {()=>changeVolume(30)} className={styles.footer__icon} />
                             )}
                         </span>
                     </Grid>
                     <Grid size="grow">
                         <span className={styles.footer__right_span}>
-                            <Slider value={volume ? volume : 100} onChange={handleVolume} style={{ color: '#1db954' }} />
+                            <Slider value={volume} onChange={handleVolume} style={{ color: '#1db954' }} />
                         </span>
                     </Grid>
                 </Grid>
