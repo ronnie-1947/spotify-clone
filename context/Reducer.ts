@@ -23,6 +23,7 @@ export const initialState = {
     repeat: false,
     playing: false,
     item: null,
+    unavailable_track_ids: [],
     current_page: 'home'
 }
 
@@ -84,6 +85,13 @@ export const reducer = (state:any, action:Action)=>{
             return {
                 ...state,
                 shuffle: action.shuffle
+            }
+
+        // Tracks with no resolvable preview, so the rows can be dimmed out.
+        case 'SET_UNAVAILABLE_TRACKS':
+            return {
+                ...state,
+                unavailable_track_ids: action.payload
             }
 
         case 'SET_REPEAT':

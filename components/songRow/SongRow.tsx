@@ -9,9 +9,10 @@ interface Props {
     track: any
     clickHandler: (track: any) => void
     position: number
+    unavailable?: boolean
 }
 
-const SongRow = ({ track, position, clickHandler }: Props) => {
+const SongRow = ({ track, position, clickHandler, unavailable }: Props) => {
 
     const [{ playing, playing_track_id }, dispatch] = useStateContextValue()
     const handlePlayPause = () => {
@@ -24,7 +25,7 @@ const SongRow = ({ track, position, clickHandler }: Props) => {
     }
 
     return (
-        <div className={styles.song_container}>
+        <div className={`${styles.song_container} ${unavailable ? styles.unavailable : ''}`}>
             {
                 playing_track_id === track?.id && playing && (
                     <div className={styles.position}>
@@ -45,7 +46,7 @@ const SongRow = ({ track, position, clickHandler }: Props) => {
                     </div>
                 )
             }
-            <div onClick={() => clickHandler(track)} className={styles.song}>
+            <div onClick={() => !unavailable && clickHandler(track)} className={styles.song}>
                 {track?.album?.images?.[0]?.url && (
                     <Image src={track?.album?.images?.[0]?.url} alt={track?.name} height={50} width={50} />
                 )}
@@ -54,6 +55,7 @@ const SongRow = ({ track, position, clickHandler }: Props) => {
                     <p>
                         {track?.artists?.map((artist: { name: string }) => artist.name).join(', ')}
                         - {track?.album?.name}
+                        {unavailable && <span className={styles.badge}>preview unavailable</span>}
                     </p>
                 </div>
             </div>

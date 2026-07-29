@@ -47,3 +47,18 @@
         opacity: .8;
     }
 }
+
+.unavailable {
+    opacity: .45;
+
+    .song { cursor: default; }
+    &:hover { background-color: transparent; }
+}
+
+.badge {
+    margin-left: 1rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: grey;
+}

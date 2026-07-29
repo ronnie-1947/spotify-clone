@@ -18,6 +18,22 @@ You can start editing the page by modifying `pages/index.tsx`. The page auto-upd
 
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
+## Where the audio comes from
+
+Spotify withdrew 30-second `preview_url`s from apps without extended quota mode on
+2024-11-27, and every track the Web API returns now has `preview_url: null`. Playback
+therefore uses the free [iTunes Search API](https://performance-partners.apple.com/search-api)
+instead: `/api/preview` looks a track up by artist, title and duration and hands back a
+30s Apple preview, which the player plays alongside Spotify's metadata.
+
+Matching is heuristic, so obscure releases resolve to nothing — those rows are dimmed
+and labelled "preview unavailable" rather than hidden. Lookups happen at play time only
+and are cached in `localStorage`, to stay inside iTunes' rate limit.
+
+This is fine for a personal demo; it is not a basis for a commercial product. Full
+background, including the rejected alternatives, is in
+[docs/preview-fallback-plan.md](docs/preview-fallback-plan.md).
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

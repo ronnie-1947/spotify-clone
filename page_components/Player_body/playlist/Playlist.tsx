@@ -7,7 +7,7 @@ import SongRow from '../../../components/songRow/SongRow'
 
 const Playlist = () => {
 
-    const [{ active_playlist, playing_playlist_id, playing, user }, dispatch] = useStateContextValue()
+    const [{ active_playlist, playing_playlist_id, playing, user, unavailable_track_ids }, dispatch] = useStateContextValue()
 
     const playTrack = async (track: any) => {
 
@@ -80,7 +80,13 @@ const Playlist = () => {
 
                 {
                     active_playlist?.tracks?.items?.filter((t:any)=>t?.track?.id).map((item: any, i: number) => (
-                        <SongRow position={i} clickHandler={playTrack} key={i} track={item?.track} />
+                        <SongRow
+                            position={i}
+                            clickHandler={playTrack}
+                            key={item?.track?.id ?? i}
+                            track={item?.track}
+                            unavailable={unavailable_track_ids?.includes(item?.track?.id)}
+                        />
                     ))
                 }
             </div>

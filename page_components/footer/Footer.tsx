@@ -6,6 +6,10 @@ import { useStateContextValue } from '../../context/StateProvider'
 import { PlayCircleOutlineOutlined, PauseCircleFilledOutlined, VolumeMute, SkipPrevious, SkipNext, PlaylistPlay, Shuffle, Repeat, VolumeDown } from '@mui/icons-material'
 import { Grid, Slider } from '@mui/material'
 import MediaProgress from '../../components/mediaProgress/MediaProgress'
+import { resolvePreview, prefetchPreview } from '../../lib/preview'
+
+// A playlist where nothing resolves shouldn't spin through all 50 tracks.
+const MAX_CONSECUTIVE_MISSES = 3
 
 const suffleArray: (arr: any[]) => any[] = (pointerarr) => {
 
@@ -30,6 +34,65 @@ const Footer = () => {
     const [playTime, setPlayTime] = useState(0)
     const [playingTrack, setPlayingTrack] = useState<any>(null)
 
+    // Guards against a slow lookup landing after the user has skipped on.
+    const requestedTrackId = useRef<string | null>(null)
+    const unavailableIds = useRef<Set<string>>(new Set())
+
+    const loadTrack = async (track: any, queue: any[], misses = 0) => {
+
+        const { current } = audio
+
+        if (!track) {
+            current.src = ''
+            dispatch({
+                type: 'SET_PLAY_PAUSE',
+                playing: false
+            })
+            return
+        }
+
+        requestedTrackId.current = track.id
+        dispatch({
+            type: 'SET_PLAYING_TRACK',
+            playing_track_id: track.id
+        })
+        setPlayingTrack(track)
+
+        const url = await resolvePreview(track)
+
+        // The user moved on while we were waiting — drop this result on the floor.
+        if (requestedTrackId.current !== track.id) return
+
+        const nextInQueue = queue[queue.findIndex((c: any) => c.id === track.id) + 1]
+
+        if (!url) {
+            unavailableIds.current.add(track.id)
+            dispatch({
+                type: 'SET_UNAVAILABLE_TRACKS',
+                payload: [...unavailableIds.current]
+            })
+
+            if (misses >= MAX_CONSECUTIVE_MISSES) {
+                current.src = ''
+                dispatch({
+                    type: 'SET_PLAY_PAUSE',
+                    playing: false
+                })
+                return
+            }
+
+            return loadTrack(nextInQueue, queue, misses + 1)
+        }
+
+        current.src = url
+        dispatch({
+            type: 'SET_PLAY_PAUSE',
+            playing: true
+        })
+
+        prefetchPreview(nextInQueue)
+    }
+
     useEffect(() => {
 
         const derivedVolume = localStorage.getItem('volume')
@@ -41,12 +104,6 @@ const Footer = () => {
     useEffect(() => {
 
         if (active_playlist?.id !== playing_playlist_id) return
-
-        const { current } = audio
-        dispatch({
-            type: 'SET_PLAYING_TRACK',
-            playing_track_id: outer_playing_track_id
-        })
 
         const current_playlist = active_playlist?.tracks?.items?.map((t: any) => {
 
@@ -66,7 +123,6 @@ const Footer = () => {
         if (!track) return
 
         setDupCurrent_playlist(current_playlist)
-        setPlayingTrack(track)
 
         let c_playlist = current_playlist
 
@@ -76,12 +132,9 @@ const Footer = () => {
 
         setCurrent_playlist(c_playlist)
 
-        current.src = track?.preview_url
-
-        dispatch({
-            type: 'SET_PLAY_PAUSE',
-            playing: true
-        })
+        // c_playlist, not current_playlist: with shuffle on, the shuffled order is
+        // what "next" should follow.
+        void loadTrack(track, c_playlist)
 
     }, [audio, outer_playing_track_id, playing_playlist_id])
 
@@ -112,29 +165,11 @@ const Footer = () => {
     const playNext = () => {
 
         if (!playing_track_id) return
-        const { current } = audio
 
         let nextIndx = current_playlist?.findIndex(c => c.id === playing_track_id) + 1
         if (nextIndx >= current_playlist.length && repeat) nextIndx = 0
 
-        const track = current_playlist[nextIndx]
-        if (!track) {
-
-            current.src = ''
-            return
-        }
-
-        dispatch({
-            type: 'SET_PLAYING_TRACK',
-            playing_track_id: track?.id
-        })
-        setPlayingTrack(track)
-
-        current.src = track?.preview_url
-        dispatch({
-            type: 'SET_PLAY_PAUSE',
-            playing: true
-        })
+        void loadTrack(current_playlist[nextIndx], current_playlist)
     }
 
 
@@ -155,19 +190,9 @@ const Footer = () => {
             return
         }
 
-        const track = current_playlist[prevIndx]
-
-        dispatch({
-            type: 'SET_PLAYING_TRACK',
-            playing_track_id: track?.id
-        })
-        setPlayingTrack(track)
-
-        current.src = track?.preview_url
-        dispatch({
-            type: 'SET_PLAY_PAUSE',
-            playing: true
-        })
+        // Backward auto-skip is deliberately not implemented — loadTrack's miss path
+        // always advances forward, which is right when the previous track is a miss.
+        void loadTrack(current_playlist[prevIndx], current_playlist)
     }
 
     const handleSuffle = () => {
