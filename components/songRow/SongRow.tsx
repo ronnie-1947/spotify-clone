@@ -23,9 +23,6 @@ const SongRow = ({ track, position, clickHandler }: Props) => {
 
     }
 
-
-    if (!track?.preview_url) return null
-
     return (
         <div className={styles.song_container}>
             {

@@ -27,12 +27,16 @@ export const getOwnPlaylists = async (): Promise<any[]> => {
 // The playlist Home opens with, standing in for the hardcoded Discover Weekly.
 // Pass `own` if the caller already has the user's playlists, to save a round trip.
 export const getDefaultPlaylist = async (own?: any[]): Promise<any | null> => {
-    let id = (own ?? await getOwnPlaylists())[0]?.id
+    const playlists = own ?? await getOwnPlaylists()
+
+    // The account may own only empty playlists — opening one gives a blank Home.
+    let id = playlists.find((p: any) => p?.tracks?.total > 0)?.id
 
     if (!id) {
-        // Nothing of their own to open — fall back to whatever search hands us.
+        // Nothing of their own worth opening — fall back to whatever search hands us.
         const results: any = await spotify.searchPlaylists('top hits')
-        id = usable(results?.playlists?.items)[0]?.id
+        id = usable(results?.playlists?.items).find((p: any) => p?.tracks?.total > 0)?.id
+            ?? usable(results?.playlists?.items)[0]?.id
     }
 
     if (!id) return null

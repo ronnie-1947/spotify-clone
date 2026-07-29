@@ -21,13 +21,23 @@ const Search = ({searchStr}:Props) => {
         const timer = setTimeout(async() => {
             
             if(!searchStr){
-                // Featured playlists are gone from the Web API — the user's own
-                // stand in as the landing state instead.
-                const playlists: any = await getOwnPlaylists()
-                const artists: any = await spotify.getMyTopArtists()
+                // Featured playlists are gone from the Web API, and a fresh account
+                // has no top artists — fall back to search for both.
+                let playlists: any[] = await getOwnPlaylists()
+                if (!playlists.length) {
+                    const found: any = await spotify.searchPlaylists('top hits')
+                    playlists = usable(found?.playlists?.items)
+                }
+
+                const top: any = await spotify.getMyTopArtists()
+                let artists: any[] = top?.items ?? []
+                if (!artists.length) {
+                    const found: any = await spotify.searchArtists('this is')
+                    artists = found?.artists?.items ?? []
+                }
 
                 setPlaylists(playlists)
-                setArtists(artists?.items)
+                setArtists(artists)
                 return
             }
             

@@ -27,7 +27,7 @@ const Playlist = () => {
         if (playing_playlist_id !== active_playlist?.id) {
 
             const playlist_id = active_playlist?.id
-            const track_id = active_playlist?.tracks?.items?.filter((t:any)=>t && t.track && t.track.preview_url && t.track.id)[0]?.track?.id
+            const track_id = active_playlist?.tracks?.items?.filter((t:any)=>t?.track?.id)[0]?.track?.id
             
             if(!track_id) return
 
@@ -79,7 +79,7 @@ const Playlist = () => {
                 </div>
 
                 {
-                    active_playlist?.tracks?.items?.filter((t:any)=>t?.track?.preview_url).map((item: any, i: number) => (
+                    active_playlist?.tracks?.items?.filter((t:any)=>t?.track?.id).map((item: any, i: number) => (
                         <SongRow position={i} clickHandler={playTrack} key={i} track={item?.track} />
                     ))
                 }

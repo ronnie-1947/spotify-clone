@@ -50,11 +50,12 @@ const Footer = () => {
 
         const current_playlist = active_playlist?.tracks?.items?.map((t: any) => {
 
-            if (t && t.track && t.track.preview_url && t.track.id) {
+            if (t && t.track && t.track.id) {
                 return {
                     id: t?.track?.id,
-                    preview_url: t?.track?.preview_url,
+                    preview_url: t?.track?.preview_url ?? null,
                     name: t?.track?.name,
+                    duration_ms: t?.track?.duration_ms,
                     images: t?.track?.album?.images,
                     artists: t?.track?.artists
                 }
@@ -89,7 +90,9 @@ const Footer = () => {
     useEffect(() => {
         const { current } = audio
 
-        if (playing) { current.play() }
+        // With previews resolved lazily, `src` can legitimately be empty --
+        // play() on an empty source rejects with a DOMException.
+        if (playing && current.src) { current.play().catch(() => {}) }
         else { current.pause() }
 
     }, [playing])

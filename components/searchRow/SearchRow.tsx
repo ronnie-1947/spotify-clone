@@ -8,6 +8,8 @@ interface Props {
     heading: ('artists' | 'albums' | 'playlists' | 'shows' | 'recently played')
 }
 
+const PLACEHOLDER_ART = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmVyc2lvbj0iMS4xIi8+'
+
 const SearchRow = ({ row, heading }: Props) => {
 
     const [more, setMore] = useState(false)
@@ -94,12 +96,13 @@ const SearchRow = ({ row, heading }: Props) => {
             <div className={`${more ? styles.songRow__cardsAll : styles.songRow__cards}`}>
                 {
                     row?.map((lib: any) => {
+                        if (!lib?.id) return null
                         // `images` comes back as null, not [], for playlists with no cover art
-                        if (!lib?.images?.[0]?.url) return null
+                        const art = lib?.images?.[0]?.url ?? PLACEHOLDER_ART
                         return (
                             <div onClick={() => clickHandler(lib, heading)} key={lib.id} className={styles.card}>
                                 <span className={heading === 'artists' ? styles.card__imgContainerRounded : ''}>
-                                    <img src={lib.images[0].url} alt={lib.name} />
+                                    <img src={art} alt={lib.name} />
                                 </span>
                                 <p className={styles.card__name}>{lib.name}</p>
 
