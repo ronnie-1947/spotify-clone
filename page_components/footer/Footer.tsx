@@ -3,7 +3,7 @@ import styles from './Footer.module.scss'
 import Image from 'next/image'
 import { useStateContextValue } from '../../context/StateProvider'
 
-import { PlayCircleFilledRounded, PauseCircleFilledRounded, VolumeOffRounded, SkipPreviousRounded, SkipNextRounded, QueueMusicRounded, ShuffleRounded, RepeatRounded, VolumeDownRounded, VolumeUpRounded } from '@mui/icons-material'
+import { PlayArrowRounded, PauseRounded, VolumeOffRounded, SkipPreviousRounded, SkipNextRounded, QueueMusicRounded, ShuffleRounded, RepeatRounded, VolumeDownRounded, VolumeUpRounded } from '@mui/icons-material'
 import { Slider } from '@mui/material'
 import MediaProgress from '../../components/mediaProgress/MediaProgress'
 import { resolvePreview, prefetchPreview } from '../../lib/preview'
@@ -363,9 +363,9 @@ const Footer = () => {
                     >
                         {
                             !playing ? (
-                                <PlayCircleFilledRounded className={styles.footer__icon_play} />
+                                <PlayArrowRounded className={styles.footer__icon_play} />
                             ) : (
-                                <PauseCircleFilledRounded className={styles.footer__icon_play} />
+                                <PauseRounded className={styles.footer__icon_play} />
                             )
                         }
                     </button>

@@ -101,7 +101,7 @@
         flex: 0 0 auto;
         font-size: 1.1rem;
         font-variant-numeric: tabular-nums;
-        color: grey;
+        color: #b3b3b3;
         min-width: 3.2rem;
         text-align: center;
         user-select: none;
@@ -135,13 +135,15 @@
         border: none;
         border-radius: 50%;
         background: none;
-        color: grey;
+        // Spotify's secondary-control grey -- reads as muted next to the white
+        // play disc, but is still legible against #282828.
+        color: #b3b3b3;
         cursor: pointer;
         transition: color 0.15s ease-in-out, transform 0.15s ease-in-out, opacity 0.15s ease-in-out;
 
         &:hover:not(:disabled) {
             color: white;
-            transform: scale(1.12);
+            transform: scale(1.06);
         }
 
         &:active:not(:disabled) {
@@ -158,17 +160,27 @@
             opacity: 0.45;
         }
 
-        // The filled-circle icons punch a transparent glyph out of the disc, so the
-        // footer background shows through the play/pause mark -- Spotify's white
-        // button, with no wrapper background needed (one would leak a white ring
-        // around the icon's smaller circle and fill the cutout).
+        // A real white disc with a dark glyph, rather than a filled-circle icon:
+        // the icon variants punch the glyph out as transparent, so the mark takes
+        // the footer's colour instead of staying solid black.
         &_play {
-            color: white;
-            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+            flex: 0 0 auto;
+            height: 3.6rem;
+            width: 3.6rem;
+            background-color: white;
+            color: #121212;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            // Optical breathing room from the skip buttons on either side.
+            margin: 0 0.4rem;
 
             &:hover:not(:disabled) {
-                color: white;
+                color: #121212;
+                background-color: white;
                 transform: scale(1.06);
+            }
+
+            &:focus-visible {
+                outline-offset: 2px;
             }
         }
     }
@@ -178,8 +190,7 @@
     }
 
     &__icon_play {
-        font-size: 3.6rem;
-        // Bleed slightly past the button's own box so no white ring peeks out.
+        font-size: 2.6rem;
         display: block;
     }
 
