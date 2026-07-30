@@ -2,7 +2,7 @@ import React, { Fragment } from 'react'
 import styles from './Playlist.module.scss'
 import { useStateContextValue } from '../../../context/StateProvider'
 
-import { PlayCircleFilled, PauseCircleFilled } from '@mui/icons-material'
+import { PlayCircleFilled, PauseCircleFilled, Favorite } from '@mui/icons-material'
 import SongRow from '../../../components/songRow/SongRow'
 
 const Playlist = () => {
@@ -50,10 +50,12 @@ const Playlist = () => {
     return (
         <Fragment>
             <div className={styles.body__info} >
-                <span className={styles.body__info_img}>
+                <span className={`${styles.body__info_img} ${active_playlist?.liked ? styles.body__info_liked : ''}`}>
                     {
                         active_playlist?.images?.[0]?.url ? (
                             <img src={active_playlist?.images?.[0]?.url} alt={user?.display_name?.trim()} />
+                        ) : active_playlist?.liked ? (
+                            <Favorite className={styles.body__info_likedIcon} />
                         ) : (
                             <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmVyc2lvbj0iMS4xIi8+" alt="transparent" />
                         )

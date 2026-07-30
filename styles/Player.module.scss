@@ -6,6 +6,7 @@
     
     &__body{
         display: grid;
-        grid-template-columns: 23rem 1fr;
+        // Wide enough for the library rows' artwork + two lines of text
+        grid-template-columns: 28rem 1fr;
     }
 }

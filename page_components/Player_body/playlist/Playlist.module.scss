@@ -28,6 +28,18 @@
             box-shadow: 0 4px 60px rgba(0,0,0,.5);
         }
 
+        // Liked Songs is a pseudo-playlist with no cover art of its own
+        &_liked{
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4a1fd6 0%, #8f7cf0 100%);
+        }
+
+        &_likedIcon{
+            color: white;
+            font-size: 6rem !important;
+        }
+
         &_text{
             flex: 1;
             // background-color: tomato;

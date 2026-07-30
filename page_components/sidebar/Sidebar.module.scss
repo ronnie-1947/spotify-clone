@@ -1,6 +1,6 @@
 .sidebar{
     background-color: #040404;
-    padding: 1rem 1rem 1rem 2rem;
+    padding: 1rem 1rem 1rem 1.6rem;
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 9rem);
@@ -18,20 +18,102 @@
         }
     }
 
+    &__libraryHeader{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        // Paired with the nav block above, which has no bottom margin of its own
+        margin-top: 2.5rem;
+        padding-right: .6rem;
+    }
+
     &__title{
         color: white;
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         letter-spacing: 2px;
+    }
+
+    // How many collections are in the library
+    &__count{
+        color: #a7a7a7;
+        font-size: 1.2rem;
     }
 
     hr{
         border: 1px solid #282828;
-        width: 90%;
+        width: 100%;
         margin-top: 8px;
+        margin-bottom: .8rem;
     }
 
     &__playlists{
         overflow-y: auto;
-        flex: 1;   
+        overflow-x: hidden;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+        // The rows carry their own padding, so pull them back level with the header
+        margin-left: -.6rem;
+        margin-right: -.4rem;
+    }
+
+    &__empty{
+        color: #a7a7a7;
+        font-size: 1.2rem;
+        line-height: 1.6;
+        padding: 1rem .6rem;
+    }
+
+    &__skeleton{
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        padding: .6rem;
+
+        &_art{
+            height: 4.8rem;
+            width: 4.8rem;
+            border-radius: .4rem;
+            flex-shrink: 0;
+            background-color: #1c1c1c;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        &_meta{
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+        }
+
+        &_line,
+        &_lineShort{
+            height: 1.2rem;
+            border-radius: .4rem;
+            background-color: #1c1c1c;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        &_line{
+            width: 80%;
+        }
+
+        &_lineShort{
+            width: 50%;
+        }
+    }
+}
+
+@keyframes pulse{
+    0%, 100% { opacity: 1; }
+    50% { opacity: .45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar__skeleton_art,
+    .sidebar__skeleton_line,
+    .sidebar__skeleton_lineShort {
+        animation: none;
     }
 }
