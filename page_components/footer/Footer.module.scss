@@ -1,29 +1,44 @@
 @use "../../sass/abstract/variables" as *;
+@use "../../sass/abstract/mixin" as *;
 
 .footer {
     background-color: #282828;
     width: 100%;
-    padding: 1rem;
+    padding: 1.2rem 1.6rem;
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 1.6rem;
     color: white;
     max-width: 100vw;
     overflow: hidden;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 
     &__left {
         flex: 0.3;
         display: flex;
+        align-items: center;
+        gap: 1.4rem;
+        min-width: 0;
         max-width: 30rem;
     }
 
     &__albumImg {
-        margin-right: 2rem;
         display: flex;
         align-items: center;
-        flex: 4rem 0 auto;
+        justify-content: center;
+        flex: 0 0 5.6rem;
+        height: 5.6rem;
+        width: 5.6rem;
+        border-radius: 4px;
+        overflow: hidden;
+        background-color: rgba(255, 255, 255, 0.06);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+
         img {
-            object-fit: contain;
-            max-height: 6rem;
+            object-fit: cover;
+            height: 100%;
+            width: 100%;
         }
     }
 
@@ -31,17 +46,25 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        gap: 0.3rem;
         color: white;
         overflow-x: hidden;
         flex: 1;
-        
+        min-width: 0;
+
         h4 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            line-height: 1.3;
             overflow-x: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
         }
-        
+
         p{
+            font-size: 1.2rem;
+            color: grey;
+            line-height: 1.3;
             overflow-x: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -50,47 +73,150 @@
 
     &__center {
         flex: 0.4;
-        max-width: 35rem;
-        // display: grid;
-        // background-color: tomato;
-        // background-color: dodgerblue;
+        max-width: 45rem;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6rem;
 
         &_btns {
-            padding: 0 7rem;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            flex: 1;
-            color: white;
+            // Even gaps instead of space-between: the play button stays optically
+            // centred no matter how wide the footer gets.
+            gap: 1.6rem;
         }
+
+        &_progress {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+        }
+    }
+
+    &__time {
+        flex: 0 0 auto;
+        font-size: 1.1rem;
+        font-variant-numeric: tabular-nums;
+        color: grey;
+        min-width: 3.2rem;
+        text-align: center;
+        user-select: none;
     }
 
     &__right {
         flex: 0.3;
         align-items: center;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
+        gap: 1rem;
         max-width: 25rem;
-        padding-right: 2rem;
+        min-width: 0;
+        padding-right: 1rem;
 
-        &_span {
+        &_slider {
             display: flex;
-            height: 100%;
             align-items: center;
+            flex: 1;
+            min-width: 8rem;
+            max-width: 12.5rem;
+        }
+    }
+
+    // Real buttons: keyboard focus, a proper hit area, and no inherited form styling.
+    &__ctrl {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: none;
+        color: grey;
+        cursor: pointer;
+        transition: color 0.15s ease-in-out, transform 0.15s ease-in-out, opacity 0.15s ease-in-out;
+
+        &:hover:not(:disabled) {
+            color: white;
+            transform: scale(1.12);
+        }
+
+        &:active:not(:disabled) {
+            transform: scale(1);
+        }
+
+        &:focus-visible {
+            outline: 2px solid white;
+            outline-offset: 3px;
+        }
+
+        &:disabled {
+            cursor: default;
+            opacity: 0.45;
+        }
+
+        // The filled-circle icons punch a transparent glyph out of the disc, so the
+        // footer background shows through the play/pause mark -- Spotify's white
+        // button, with no wrapper background needed (one would leak a white ring
+        // around the icon's smaller circle and fill the cutout).
+        &_play {
+            color: white;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+
+            &:hover:not(:disabled) {
+                color: white;
+                transform: scale(1.06);
+            }
         }
     }
 
     &__icon {
-        color: grey;
+        font-size: 2.2rem;
+    }
 
-        &:hover {
-            transition: all 0.2s ease-in-out;
-            transform: scale(1.2) !important;
-            color: white;
-        }
+    &__icon_play {
+        font-size: 3.6rem;
+        // Bleed slightly past the button's own box so no white ring peeks out.
+        display: block;
     }
 
     &__green {
         color: $spotify_green;
+
+        &:hover:not(:disabled) {
+            color: $spotify_green;
+        }
+    }
+
+    @include respond(laptop) {
+        &__center_btns {
+            gap: 1.2rem;
+        }
+
+        &__right {
+            gap: 0.8rem;
+            padding-right: 0;
+        }
+    }
+
+    @include respond(tablet) {
+        &__albumImg {
+            flex: 0 0 4.8rem;
+            height: 4.8rem;
+            width: 4.8rem;
+        }
+
+        // Queue and volume are the first things Spotify drops on narrow screens.
+        &__right {
+            display: none;
+        }
+
+        &__left,
+        &__center {
+            flex: 1;
+        }
     }
 }

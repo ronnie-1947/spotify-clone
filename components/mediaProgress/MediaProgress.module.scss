@@ -1,21 +1,55 @@
 @use "../../sass/abstract/variables" as *;
 
 .progress_container {
-    height: 5px;
+    // The visible bar is 4px, but the grab area needs to be finger/mouse sized.
+    padding: 0.7rem 0;
+    // Sits between the elapsed/total labels in the footer and takes the slack.
+    flex: 1;
+    min-width: 0;
+    width: 100%;
     cursor: pointer;
+    outline: none;
+
+    &:hover,
+    &:focus-visible {
+        .progress {
+            height: 6px;
+        }
+
+        .progress__thumb {
+            opacity: 1;
+        }
+    }
 }
 
 .progress{
     background-color: #eeeeee91;
-    border-radius: 5px;
-    height: 3px;
-    margin-top: 2rem;
+    border-radius: 9rem;
+    height: 4px;
     width: 100%;
+    pointer-events: none;
+    transition: height 0.1s ease-in-out;
 
     &__bar{
+        position: relative;
         height: 100%;
         width: 0;
         max-width: 100%;
+        border-radius: inherit;
         background-color: $spotify_green;
+    }
+
+    &__thumb {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        height: 1.2rem;
+        width: 1.2rem;
+        border-radius: 50%;
+        background-color: white;
+        box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.5);
+        transform: translate(50%, -50%);
+        opacity: 0;
+        transition: opacity 0.1s ease-in-out;
     }
 }

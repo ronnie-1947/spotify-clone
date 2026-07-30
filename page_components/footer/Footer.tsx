@@ -3,13 +3,52 @@ import styles from './Footer.module.scss'
 import Image from 'next/image'
 import { useStateContextValue } from '../../context/StateProvider'
 
-import { PlayCircleOutlineOutlined, PauseCircleFilledOutlined, VolumeMute, SkipPrevious, SkipNext, PlaylistPlay, Shuffle, Repeat, VolumeDown } from '@mui/icons-material'
-import { Grid, Slider } from '@mui/material'
+import { PlayCircleFilledRounded, PauseCircleFilledRounded, VolumeOffRounded, SkipPreviousRounded, SkipNextRounded, QueueMusicRounded, ShuffleRounded, RepeatRounded, VolumeDownRounded, VolumeUpRounded } from '@mui/icons-material'
+import { Slider } from '@mui/material'
 import MediaProgress from '../../components/mediaProgress/MediaProgress'
 import { resolvePreview, prefetchPreview } from '../../lib/preview'
 
 // A playlist where nothing resolves shouldn't spin through all 50 tracks.
 const MAX_CONSECUTIVE_MISSES = 3
+
+// Spotify green -- mirrors $spotify_green, which SCSS can't hand to MUI's sx prop.
+const SPOTIFY_GREEN = '#1db954'
+
+const RAIL_GREY = '#eeeeee91'
+
+const volumeSliderSx = {
+    color: SPOTIFY_GREEN,
+    padding: '1.3rem 0',
+    '& .MuiSlider-rail': {
+        opacity: 1,
+        backgroundColor: RAIL_GREY,
+    },
+    '& .MuiSlider-track': {
+        border: 'none',
+    },
+    // Thumb hidden until the bar is hovered/focused, like Spotify's.
+    '& .MuiSlider-thumb': {
+        width: 12,
+        height: 12,
+        backgroundColor: '#fff',
+        opacity: 0,
+        transition: 'opacity 0.1s ease-in-out',
+        '&:hover, &.Mui-focusVisible, &.Mui-active': {
+            boxShadow: 'none',
+        },
+    },
+    '&:hover .MuiSlider-thumb, & .MuiSlider-thumb.Mui-focusVisible, & .MuiSlider-thumb.Mui-active': {
+        opacity: 1,
+    },
+}
+
+const formatTime = (seconds: number) => {
+    if (!Number.isFinite(seconds) || seconds < 0) return '0:00'
+
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${`${secs}`.padStart(2, '0')}`
+}
 
 const suffleArray: (arr: any[]) => any[] = (pointerarr) => {
 
@@ -32,11 +71,21 @@ const Footer = () => {
     const [dupCurrent_playlist, setDupCurrent_playlist] = useState([])
     const [volume, setVolume] = useState<number>(50)
     const [playTime, setPlayTime] = useState(0)
+    const [elapsed, setElapsed] = useState(0)
+    const [duration, setDuration] = useState(0)
     const [playingTrack, setPlayingTrack] = useState<any>(null)
 
     // Guards against a slow lookup landing after the user has skipped on.
     const requestedTrackId = useRef<string | null>(null)
     const unavailableIds = useRef<Set<string>>(new Set())
+
+    // The bar and the elapsed label would otherwise keep the outgoing track's
+    // position until the new preview's first timeupdate.
+    const resetProgress = () => {
+        setPlayTime(0)
+        setElapsed(0)
+        setDuration(0)
+    }
 
     const loadTrack = async (track: any, queue: any[], misses = 0) => {
 
@@ -44,6 +93,7 @@ const Footer = () => {
 
         if (!track) {
             current.src = ''
+            resetProgress()
             dispatch({
                 type: 'SET_PLAY_PAUSE',
                 playing: false
@@ -74,6 +124,7 @@ const Footer = () => {
 
             if (misses >= MAX_CONSECUTIVE_MISSES) {
                 current.src = ''
+                resetProgress()
                 dispatch({
                     type: 'SET_PLAY_PAUSE',
                     playing: false
@@ -85,6 +136,7 @@ const Footer = () => {
         }
 
         current.src = url
+        resetProgress()
         dispatch({
             type: 'SET_PLAY_PAUSE',
             playing: true
@@ -228,7 +280,13 @@ const Footer = () => {
         const fullDuration = audio.current.duration
         const currentTime = audio.current.currentTime
 
+        setElapsed(currentTime)
         setPlayTime((currentTime / fullDuration) * 100)
+    }
+
+    // Previews are nominally 30s, but the real length comes off the loaded file.
+    const handleLoadedMetadata = () => {
+        setDuration(audio.current.duration)
     }
 
     const playTimeHandler = (e: any) => {
@@ -264,7 +322,7 @@ const Footer = () => {
                 <span className={styles.footer__albumImg}>
                     {
                         playingTrack?.images?.[0]?.url && (
-                            <Image src={playingTrack?.images?.[0]?.url} alt="song album" height={60} width={60} />
+                            <Image src={playingTrack?.images?.[0]?.url} alt="song album" height={56} width={56} />
                         )
                     }
                 </span>
@@ -275,47 +333,99 @@ const Footer = () => {
             </div>
             <div className={styles.footer__center}>
                 <div className={styles.footer__center_btns}>
-                    <Shuffle onClick={handleSuffle} className={`${styles.footer__icon} ${shuffle && styles.footer__green}`} />
-                    <SkipPrevious onClick={playPrev} className={styles.footer__icon} />
-                    {
-                        !playing ? (
-                            <PlayCircleOutlineOutlined onClick={handlePlayPause} style={{ fontSize: '4rem' }} className={styles.footer__icon} />
-                        ) : (
-                            <PauseCircleFilledOutlined onClick={handlePlayPause} style={{ fontSize: '4rem' }} className={styles.footer__icon} />
-                        )
-                    }
-                    <SkipNext onClick={playNext} className={styles.footer__icon} />
-                    <Repeat onClick={handleRepeat} className={`${styles.footer__icon} ${repeat && styles.footer__green}`} />
+                    <button
+                        type="button"
+                        onClick={handleSuffle}
+                        title="Shuffle"
+                        aria-label="Shuffle"
+                        aria-pressed={shuffle}
+                        className={`${styles.footer__ctrl} ${shuffle ? styles.footer__green : ''}`}
+                    >
+                        <ShuffleRounded className={styles.footer__icon} />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={playPrev}
+                        title="Previous"
+                        aria-label="Previous track"
+                        disabled={!playing_track_id}
+                        className={styles.footer__ctrl}
+                    >
+                        <SkipPreviousRounded className={styles.footer__icon} />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handlePlayPause}
+                        title={playing ? 'Pause' : 'Play'}
+                        aria-label={playing ? 'Pause' : 'Play'}
+                        disabled={!playing_track_id}
+                        className={`${styles.footer__ctrl} ${styles.footer__ctrl_play}`}
+                    >
+                        {
+                            !playing ? (
+                                <PlayCircleFilledRounded className={styles.footer__icon_play} />
+                            ) : (
+                                <PauseCircleFilledRounded className={styles.footer__icon_play} />
+                            )
+                        }
+                    </button>
+                    <button
+                        type="button"
+                        onClick={playNext}
+                        title="Next"
+                        aria-label="Next track"
+                        disabled={!playing_track_id}
+                        className={styles.footer__ctrl}
+                    >
+                        <SkipNextRounded className={styles.footer__icon} />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleRepeat}
+                        title="Repeat"
+                        aria-label="Repeat"
+                        aria-pressed={repeat}
+                        className={`${styles.footer__ctrl} ${repeat ? styles.footer__green : ''}`}
+                    >
+                        <RepeatRounded className={styles.footer__icon} />
+                    </button>
                 </div>
-                <MediaProgress playTime={playTime} playTimeHandler={playTimeHandler} />
+                <div className={styles.footer__center_progress}>
+                    <span className={styles.footer__time}>{formatTime(elapsed)}</span>
+                    <MediaProgress playTime={playTime} playTimeHandler={playTimeHandler} />
+                    <span className={styles.footer__time}>{formatTime(duration)}</span>
+                </div>
             </div>
             <div className={styles.footer__right}>
-                {/* v9's Grid container dropped v4's `width: 100%`, so a `size="grow"`
-                    child (flex-basis: 0) collapsed the slider to a hairline. */}
-                <Grid container spacing={2} sx={{ width: '100%' }} >
-                    <Grid>
-                        <span className={styles.footer__right_span}>
-                            <PlaylistPlay className={styles.footer__icon} />
-                        </span>
-                    </Grid>
-                    <Grid>
-                        <span className={styles.footer__right_span}>
-                            {volume > 0 ? (
-                                <VolumeDown onClick = {()=>changeVolume(0)} className={styles.footer__icon} />
-                            ) : (
-                                <VolumeMute onClick = {()=>changeVolume(30)} className={styles.footer__icon} />
-                            )}
-                        </span>
-                    </Grid>
-                    <Grid size="grow">
-                        <span className={styles.footer__right_span}>
-                            <Slider value={volume} onChange={handleVolume} style={{ color: '#1db954' }} />
-                        </span>
-                    </Grid>
-                </Grid>
+                <button
+                    type="button"
+                    title="Queue"
+                    aria-label="Queue"
+                    className={styles.footer__ctrl}
+                >
+                    <QueueMusicRounded className={styles.footer__icon} />
+                </button>
+                <button
+                    type="button"
+                    onClick={() => changeVolume(volume > 0 ? 0 : 30)}
+                    title={volume > 0 ? 'Mute' : 'Unmute'}
+                    aria-label={volume > 0 ? 'Mute' : 'Unmute'}
+                    className={styles.footer__ctrl}
+                >
+                    {volume === 0 ? (
+                        <VolumeOffRounded className={styles.footer__icon} />
+                    ) : volume < 50 ? (
+                        <VolumeDownRounded className={styles.footer__icon} />
+                    ) : (
+                        <VolumeUpRounded className={styles.footer__icon} />
+                    )}
+                </button>
+                <span className={styles.footer__right_slider}>
+                    <Slider value={volume} onChange={handleVolume} aria-label="Volume" sx={volumeSliderSx} />
+                </span>
             </div>
 
-            <audio onTimeUpdate={handlePlayerTimeUpdate} onEnded={playNext} autoPlay={true} ref={audio} />
+            <audio onTimeUpdate={handlePlayerTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onEnded={playNext} autoPlay={true} ref={audio} />
         </div>
     )
 }
