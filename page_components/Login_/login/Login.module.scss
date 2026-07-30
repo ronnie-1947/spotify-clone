@@ -1,29 +1,188 @@
-.logo{
+@use '../../../sass/abstract/variables' as *;
+@use '../../../sass/abstract/mixin' as *;
 
+.logo {
     display: flex;
     justify-content: center;
     max-width: 90%;
-    
-    img{
+
+    img {
         object-fit: contain;
         width: 100%;
-        height: 15rem;
+        height: 8rem;
+
+        @include respond(phone) {
+            height: 6rem;
+        }
     }
 }
 
-.login{
+.login {
     display: grid;
     place-items: center;
     min-height: 100vh;
+    padding: 4rem 2rem;
+    color: white;
     background-color: black;
+    // Faint green wash behind the card so the black doesn't read as flat
+    background-image: radial-gradient(circle at 50% 0%, rgba(29, 185, 84, 0.28) 0%, transparent 55%);
 
-    &__container{
+    &__card {
         display: grid;
-        place-items: center;
-        color: white;
+        justify-items: center;
+        gap: 2.4rem;
+        width: 100%;
+        max-width: 52rem;
+        padding: 4rem;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 1.6rem;
+        background-color: rgba(24, 24, 24, 0.72);
+        box-shadow: 0 2.4rem 6rem rgba(0, 0, 0, 0.55);
 
-        div{
-            margin-top: 1rem;
+        @include respond(phone-large) {
+            padding: 3rem 2rem;
+            gap: 2rem;
         }
     }
+
+    &__action {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+
+        a {
+            justify-content: center;
+            width: 100%;
+            transition: transform 0.15s ease, background-color 0.15s ease;
+
+            &:hover {
+                background-color: #1ed760;
+                transform: scale(1.02);
+            }
+        }
+    }
+
+    &__footer {
+        color: rgba(255, 255, 255, 0.45);
+    }
+}
+
+.tagline {
+    max-width: 42rem;
+    font-size: 1.5rem;
+    line-height: 1.6;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.creds {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+    padding: 2rem;
+    border: 1px solid rgba(29, 185, 84, 0.35);
+    border-radius: 1rem;
+    background-color: rgba(29, 185, 84, 0.07);
+
+    &__title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: $spotify_green;
+    }
+}
+
+.credential {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1rem 1.2rem;
+    border-radius: 0.8rem;
+    background-color: rgba(0, 0, 0, 0.45);
+
+    &__label {
+        flex-shrink: 0;
+        width: 7rem;
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.5);
+
+        @include respond(phone) {
+            width: 6rem;
+        }
+    }
+
+    &__value {
+        overflow: hidden;
+        flex: 1;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 1.4rem;
+        letter-spacing: 0;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        @include respond(phone) {
+            font-size: 1.25rem;
+        }
+    }
+
+    &__copy {
+        display: grid;
+        flex-shrink: 0;
+        place-items: center;
+        padding: 0.6rem;
+        border: none;
+        border-radius: 0.6rem;
+        background-color: transparent;
+        color: rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        transition: color 0.15s ease, background-color 0.15s ease;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+    }
+}
+
+.steps {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+    list-style: none;
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        font-size: 1.4rem;
+        color: rgba(255, 255, 255, 0.75);
+
+        strong {
+            font-weight: 600;
+            color: white;
+        }
+    }
+
+    &__number {
+        display: grid;
+        flex-shrink: 0;
+        place-items: center;
+        width: 2.4rem;
+        height: 2.4rem;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.1);
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: white;
+    }
+}
+
+.note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    font-size: 1.3rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.45);
 }
